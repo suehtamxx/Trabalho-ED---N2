@@ -1,2 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef RUBRONEGRA_H
+#define RUBRONEGRA_H
+
+#endif

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "dicionario.h"
+//oi
 
 //-----Criar arvores
 arv_ingles *criar_arvBB()

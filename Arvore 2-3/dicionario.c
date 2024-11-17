@@ -4,6 +4,7 @@
 #include "dicionario.h"
 //oi
 //oi, td bem?
+//eu moro em new york, e vc?
 //-----Criar arvores
 arv_ingles *criar_arvBB()
 {

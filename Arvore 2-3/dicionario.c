@@ -3,7 +3,7 @@
 #include <string.h>
 #include "dicionario.h"
 
-//----Criar arvores
+//-----Criar arvores
 arv_ingles *criar_arvBB()
 {
     return NULL;
@@ -13,7 +13,7 @@ arv_B3 *criar_arvB3()
     return NULL;
 }
 //-----
-//----Alocar arvore
+//-----Alocar arvore
 arv_ingles *alocar_arvBB()
 {
 
@@ -30,7 +30,7 @@ arv_B3 *criar_no_arvB3(info_ptbr info, arv_B3 *filhoE, arv_B3 *filhoC)
 return (no);
 }
 //-----
-//----Quebra No
+//-----Quebra No
 arv_B3 *quebra_no(arv_B3 **no, info_ptbr info, info_ptbr *promove, arv_B3 *filho)
 {
     arv_B3 *maior;
@@ -55,7 +55,7 @@ arv_B3 *quebra_no(arv_B3 **no, info_ptbr info, info_ptbr *promove, arv_B3 *filho
 return (maior);
 }
 //-----
-//----Adiciona Chave
+//-----Adiciona Chave
 arv_B3 *adiciona_chave(arv_B3 *no, info_ptbr info, arv_B3 *filho)
 {
     if(strcmp(info.ptbr, no->info1.ptbr) > 0)
@@ -72,4 +72,79 @@ arv_B3 *adiciona_chave(arv_B3 *no, info_ptbr info, arv_B3 *filho)
     no->nInfos = 2;
 return (no);
 }
-//----
+//-----
+//-----Verificar no
+int eh_folha(arv_B3 *portugues)
+{
+    int verifica = 0;
+
+    if(portugues->esq == NULL)
+        verifica = 1;
+    return verifica;
+}
+//-----
+//-----Inserir no
+arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, arv_B3 **pai)
+{
+    arv_B3 *maior;
+    info_ptbr promove1;
+    maior = NULL;
+
+    if(*portugues == NULL)
+        *portugues = criar_no_arvB3(info, NULL, NULL);
+    else
+    {
+        if(eh_folha(*portugues) == 1)
+        {
+            if((*portugues)->nInfos == 1)
+                *portugues = adiciona_chave(*portugues, info, NULL);
+            else
+            {
+                maior = quebra_no(portugues, info, promove, NULL);
+                if(*pai == NULL)
+                {
+                    *portugues = criar_no_arvB3(*promove, *portugues, maior);
+                    maior = NULL;
+                }
+            }
+        }
+        else
+        {
+            if(strcmp(info.ptbr, (*portugues)->info1.ptbr) < 0)
+                maior = inserir_arvB3(&((*portugues)->esq), info, promove, portugues);
+            else
+            {
+                if(((*portugues)->nInfos == 1) || (strcmp(info.ptbr, (*portugues)->info2.ptbr) < 0));
+                else
+                    maior = inserir_arvB3(&((*portugues)->dir), info, promove, portugues);
+                if(maior != NULL)
+                {
+                    if((*portugues)->nInfos == 1)
+                        *portugues = adiciona_chave(*portugues, *promove, maior);
+                    else
+                    {
+                        maior = quebra_no(portugues, *promove, &promove1, maior);
+                        if(*pai == NULL)
+                        {
+                            *portugues = criar_no_arvB3(promove1, *portugues, maior);
+                            maior = NULL;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return (maior);
+}
+//-----
+//-----Ler do arquivo
+void ler_arquivo(FILE *dicionario)
+{
+    dicionario = fopen("dicionario.txt", "r");
+    if(dicionario != NULL)
+    {
+        fseek(dicionario, 0, SEEK_SET);
+        while(fscanf(dicionario, ""))
+    }
+}
+//-----

@@ -45,7 +45,7 @@ arv_B3 *adiciona_chave(arv_B3 *no, info_ptbr info, arv_B3 *filho);
 
 //----Inserir no Arvore
 int inserir_arvBB(arv_ingles **ingles, arv_ingles *no);
-int inserir_arvB3(arv_B3 **portugues, arv_B3 *no,  info_ptbr info, info_ptbr *promove, arv_B3 **pai);
+arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, arv_B3 **pai);
 //-----
 
 

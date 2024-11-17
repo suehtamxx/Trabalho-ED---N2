@@ -3,7 +3,7 @@
 #include <string.h>
 #include "dicionario.h"
 //oi
-
+//oi, td bem?
 //-----Criar arvores
 arv_ingles *criar_arvBB()
 {

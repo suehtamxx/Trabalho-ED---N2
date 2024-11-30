@@ -97,7 +97,7 @@ Função adiciona_chave
 -> Parâmetros;
     no (ponteiro p/ árvore): nó onde a info será inserida; 
     info (struct): a info para inserir;
-    filho (ponteiro p/ árvore): filho nulo.
+    filho (ponteiro p/ árvore): filho da direita ou centro.
 
 -> Retorna os nó com a info inserida
 */
@@ -190,21 +190,28 @@ arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, ar
 
         else //Se não é folha:
         {
-            if(strcmp(info.ptbr, (*portugues)->info1.ptbr) < 0) //Verifica se a nova info é maior q a info1
-                maior = inserir_arvB3(&((*portugues)->esq), info, promove, portugues); //Vai para a sub-árvore esquerda
+            if(strcmp(info.ptbr, (*portugues)->info1.ptbr) < 0) //Verifica se a nova info é menor q a info1
+                maior = inserir_arvB3(&((*portugues)->esq), info, promove, portugues); //Vai para a sub-árvore esquerda (recursão)
             
-            else
+            else //Se não for menor que a info1
             {
-                if(((*portugues)->nInfos == 1) || (strcmp(info.ptbr, (*portugues)->info2.ptbr) < 0)); //Verifica se tem 1 info ou se a nova info é maior que info2
-                else
-                    maior = inserir_arvB3(&((*portugues)->dir), info, promove, portugues);
-                if(maior != NULL)
+                if(((*portugues)->nInfos == 1) || (strcmp(info.ptbr, (*portugues)->info2.ptbr) < 0)) //Verifica se tem 1 info ou se a nova info é menor que info2
+                    maior = inserir_arvB3(&((*portugues)->cen), info, promove, portugues); //Vai para a sub-ávore do centro (recursão)
+                
+                else //Se não for menor que info2
+                    maior = inserir_arvB3(&((*portugues)->dir), info, promove, portugues); //Vai para a sub-árvore direita (recursão)
+                    
+                if(maior != NULL) //Volta da recursão
                 {
-                    if((*portugues)->nInfos == 1)
+                    if((*portugues)->nInfos == 1) //Se tiver espaço
+                    {
                         *portugues = adiciona_chave(*portugues, *promove, maior);
+                        maior = NULL;
+                    } 
                     else
                     {
                         maior = quebra_no(portugues, *promove, &promove1, maior);
+                        *promove = promove1;
                         if(*pai == NULL)
                         {
                             *portugues = criar_no_arvB3(promove1, *portugues, maior);

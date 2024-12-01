@@ -150,7 +150,7 @@ int eh_folha(arv_B3 *portugues)
 /*
 Função inserir_arvB3
 
--> Insere uma nova indormação na árvore
+-> Insere uma nova infor na árvore
 
 -> Parâmetros:
     portugues (poteiro para ponteiro p/ árvore): raíz da árvore;
@@ -158,7 +158,7 @@ Função inserir_arvB3
     promove (ponteiro p/ árvore): info que será inserida no nó pai; 
     pai (ponteiro para ponteiro p/ árvore): pai da variável portugues.
 
--> Retorna a árvore com a nova info inserida
+-> Retorna o nó
 */
 arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, arv_B3 **pai)
 {
@@ -180,7 +180,7 @@ arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, ar
             {
                 maior = quebra_no(portugues, info, promove, NULL); //Se é folha e não tem espaço, chama a função quebra_no
                 
-                if(*pai == NULL) //Se o pai for nulo (quebrar o nó raiz)
+                if(*pai == NULL) //Se o pai for nulo (quebrou o nó raiz)
                 {
                     *portugues = criar_no_arvB3(*promove, *portugues, maior); //Chama a função criar_no_arvB3
                     maior = NULL; //Atribui nulo ao maior
@@ -205,24 +205,24 @@ arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, ar
                 {
                     if((*portugues)->nInfos == 1) //Se tiver espaço
                     {
-                        *portugues = adiciona_chave(*portugues, *promove, maior);
-                        maior = NULL;
+                        *portugues = adiciona_chave(*portugues, *promove, maior); //Chama a função adiciona_chave
+                        maior = NULL; //Atribui nulo ao maior
                     } 
-                    else
+                    else //Se não tiver espaço
                     {
-                        maior = quebra_no(portugues, *promove, &promove1, maior);
-                        *promove = promove1;
-                        if(*pai == NULL)
+                        maior = quebra_no(portugues, *promove, &promove1, maior); //Chama a função quebra_no
+                        *promove = promove1; //Atribui o promove1 ao promove (por causa de recursão)
+                        if(*pai == NULL) //Se o pai for nulo (quebrou o nó raiz)
                         {
-                            *portugues = criar_no_arvB3(promove1, *portugues, maior);
-                            maior = NULL;
+                            *portugues = criar_no_arvB3(promove1, *portugues, maior); //Cria um novo nó com a info do promove
+                            maior = NULL; //Atribui nulo ao maior
                         }
                     }
                 }
             }
         }
     }
-    return (maior);
+    return (maior); //Retorna maior
 }
 //-----
 

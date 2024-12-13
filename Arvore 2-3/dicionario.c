@@ -4,38 +4,34 @@
 #include "dicionario.h"
 
 //-----Criar arvores
+
 arv_ingles *criar_arvBB()
 {
     return NULL;
 }
-arv_B3 *criar_arvB3()
+arv_ptbr *criar_arvB3()
 {
     return NULL;
 }
-//-----
+//----------------------------------------------------------------------------------------------------
 
 //-----Alocar nó da Árvore
-arv_ingles *alocar_arvBB()
-{
 
+arv_ingles *cria_no_arvBB()
+{
+    arv_ingles * no;
+    no = (arv_ingles *)malloc(sizeof(arv_ingles));
+
+    no->dir = NULL;
+    no->esq = NULL;
+    no->info.l_unidade = NULL;
+
+    return no;
 }
-
-/*
-Função criar_no_arvB3
-
--> Aloca e adiciona a info no nó com nenhuma info e atruibui 1 ao número de infos
-
--> Parâmetros:
-    info (struct): a info para inserir;
-    filhoC (ponteiro p/ árvore): filho do centro nulo; 
-    filhoE (ponteiro p/ árvore): filho nulo para a esquerda.
-
--> Retorna os nó com a info inserida
-*/
-arv_B3 *criar_no_arvB3(info_ptbr info, arv_B3 *filhoE, arv_B3 *filhoC)
+arv_ptbr *criar_no_arvB3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC)
 {
-    arv_B3 *no; //Cria o nó
-    no = (arv_B3 *)malloc(sizeof(arv_B3)); //Aloca o nó
+    arv_ptbr *no; //Cria o nó
+    no = (arv_ptbr *)malloc(sizeof(arv_ptbr)); //Aloca o nó
 
     no->info1 = info; //Atribui a struct
     no->esq = filhoE; //Atribui o filho da esquerda
@@ -44,24 +40,13 @@ arv_B3 *criar_no_arvB3(info_ptbr info, arv_B3 *filhoE, arv_B3 *filhoC)
 
     return (no); //Retorna o nó alocado
 }
-//-----
+//----------------------------------------------------------------------------------------------------
 
-/*
-Função quebra_no
+//----Auxiliares da inserir na árvore b3
 
--> Cria um novo nó com a maior info, atualiza o promove e o número de infos
-
--> Parâmetros:
-    no (ponteiro para ponteiro p/ árvore): nó que será quebrado; 
-    info (struct): a info para inserir no nó;
-    promove (ponteiro p/ árvore): info que será inserida no nó pai;
-    filho (ponteiro p/ árvore): filho nulo.
-
--> Retorna o nó com a maior info
-*/
-arv_B3 *quebra_no(arv_B3 **no, info_ptbr info, info_ptbr *promove, arv_B3 *filho)
+arv_ptbr *quebra_no(arv_ptbr **no, info_ptbr info, info_ptbr *promove, arv_ptbr *filho)
 {
-    arv_B3 *maior; //Cria o nó maior
+    arv_ptbr *maior; //Cria o nó maior
 
     if(strcmp(info.ptbr, (*no)->info2.ptbr) > 0) //Se a nova info for maior que a info2 
     {
@@ -87,21 +72,7 @@ arv_B3 *quebra_no(arv_B3 **no, info_ptbr info, info_ptbr *promove, arv_B3 *filho
 
     return (maior); //Retorna o nó com a maior info
 }
-//-----
-
-/*
-Função adiciona_chave
-
--> Adiciona a info no nó já com 1 info e atualiza o número de infos
-
--> Parâmetros;
-    no (ponteiro p/ árvore): nó onde a info será inserida; 
-    info (struct): a info para inserir;
-    filho (ponteiro p/ árvore): filho nulo.
-
--> Retorna os nó com a info inserida
-*/
-arv_B3 *adiciona_chave(arv_B3 *no, info_ptbr info, arv_B3 *filho)
+arv_ptbr *adiciona_chave(arv_ptbr *no, info_ptbr info, arv_ptbr *filho)
 {
     //Se a nova info for maior que a do info1
     if(strcmp(info.ptbr, no->info1.ptbr) > 0)
@@ -123,19 +94,19 @@ arv_B3 *adiciona_chave(arv_B3 *no, info_ptbr info, arv_B3 *filho)
     
     return (no); //Retorna o nó com as infos inseridas
 }
-//-----
+//----------------------------------------------------------------------------------------------------
 
-/*
-Função e_folha
+//----Verifica se é folha
 
--> Verifica se o nó é uma folha
-
--> Parâmetro;
-    portugues(pornteiro p/ árvore): nó a ser verificado.
-
--> Retorna 1 para folha e 0 para não folha
-*/
-int eh_folha(arv_B3 *portugues)
+int eh_folha_BB(arv_ingles *ingles)
+{
+    int verifica = 0;
+    if(ingles->esq == NULL && ingles->dir == NULL)
+        verifica = 1;
+    
+    return verifica;
+}
+int eh_folha_B3(arv_ptbr *portugues)
 {
     int verifica = 0; //Cria e inicializa o verifica com 0
 
@@ -144,26 +115,51 @@ int eh_folha(arv_B3 *portugues)
 
     return verifica; //Retorna a verificação
 }
-//-----
+//----------------------------------------------------------------------------------------------------
 
+arv_ingles *so_um_filho_BB(arv_ingles *ingles)
+{
+    arv_ingles *aux;
+    
+    if(ingles->esq != NULL && ingles->dir == NULL)
+        aux = ingles->esq;
+    
+    else if(ingles->esq == NULL && ingles->dir != NULL)
+        aux = ingles->dir;
 
-/*
-Função inserir_arvB3
+    return aux;
+}
 
--> Insere uma nova indormação na árvore
+arv_ingles *menor_filho_BB(arv_ingles *ingles)
+{
+    while(ingles != NULL && ingles->esq != NULL)
+        ingles = ingles->esq;
 
--> Parâmetros:
-    portugues (poteiro para ponteiro p/ árvore): raíz da árvore;
-    info (struct): a info para inserir;
-    promove (ponteiro p/ árvore): info que será inserida no nó pai; 
-    pai (ponteiro para ponteiro p/ árvore): pai da variável portugues.
+    return ingles;
+}
 
--> Retorna a árvore com a nova info inserida
-*/
-arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, arv_B3 **pai)
+int ninfos_B3(arv_ptbr *portugues)
+{
+    int verifica = 0;
+    if(portugues->nInfos == 2)
+        verifica = 1;
+    
+    return verifica;
+}
+
+void troca_posicao(arv_ptbr *portugues)
+{
+    portugues->info1 = portugues->info2;
+    portugues->nInfos = 1;
+}
+//----------------------------------------------------------------------------------------------------
+
+//----Inserir no Arvore
+
+arv_ptbr *inserir_arvB3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai)
 {
     info_ptbr promove1; //Cria o promove
-    arv_B3 *maior; //Cria o nó maior
+    arv_ptbr *maior; //Cria o nó maior
     maior = NULL; //Atribui nulo ao nó maior
 
     if(*portugues == NULL) //SE a árvore estiver vazia
@@ -171,7 +167,7 @@ arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, ar
     
     else //SE NÃO:
     {
-        if(eh_folha(*portugues) == 1) //Verifica se é folha
+        if(eh_folha_B3(*portugues) == 1) //Verifica se é folha
         {
             if((*portugues)->nInfos == 1) //Verifica se tem espaço
                 *portugues = adiciona_chave(*portugues, info, NULL); //Se é folha e tem espaço, chama a função adiciona_chave
@@ -190,7 +186,9 @@ arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, ar
 
         else //Se não é folha:
         {
-            if(strcmp(info.ptbr, (*portugues)->info1.ptbr) < 0) //Verifica se a nova info é maior q a info1
+            if(strcmp(info.ptbr, (*portugues)->info1.ptbr) == 0)
+                inserir_arvBB(info.ingles, NULL);
+            if(strcmp(info.ptbr, (*portugues)->info1.ptbr) < 0) //Verifica se a nova info é menor q a info1
                 maior = inserir_arvB3(&((*portugues)->esq), info, promove, portugues); //Vai para a sub-árvore esquerda
             
             else
@@ -217,17 +215,106 @@ arv_B3 *inserir_arvB3(arv_B3 **portugues, info_ptbr info, info_ptbr *promove, ar
     }
     return (maior);
 }
-//-----
+//----------------------------------------------------------------------------------------------------
 
 
 //-----Ler do arquivo
-void ler_arquivo(FILE *dicionario)
+
+void ler_arquivo(FILE *dicionario, arv_ptbr **portugues)
 {
     dicionario = fopen("dicionario.txt", "r");
-    if(dicionario != NULL)
+    if (dicionario != NULL)
     {
         fseek(dicionario, 0, SEEK_SET);
-        while(fscanf(dicionario, ""));
+        char linha[100]; // Aumente o tamanho se as linhas forem maiores
+        char unidade_atual[100] = "";
+
+        while (fgets(linha, sizeof(linha), dicionario))
+        {
+            linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
+
+            if (linha[0] == '%') // Identifica uma unidade
+            {
+                strcpy(unidade_atual, linha + 1); // Copia a unidade atual (sem o '%')
+            }
+            else if (strchr(linha, ':')) // Identifica uma linha com tradução
+            {
+                char palavra_ingles[100];
+                char palavras_portugues[100];
+
+                sscanf(linha, "%[^:]: %[^\n]", palavra_ingles, palavras_portugues);
+
+                char *palavra_port = strtok(palavras_portugues, ",");
+                while (palavra_port)
+                {
+                    while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
+
+                    // Preenche a estrutura info_ptbr
+                    info_ptbr nova_info;
+                    strcpy(nova_info.ptbr, palavra_port); // Português
+                    strcpy(nova_info.ingles->info.ingles, palavra_ingles); // Inglês
+
+                    info_ptbr promove; // Para gerenciar possíveis promoções
+                    arv_ptbr *pai = NULL;
+
+                    // Insere na árvore
+                    inserir_arvB3(portugues, nova_info, &promove, &pai);
+
+                    palavra_port = strtok(NULL, ","); // Próxima palavra
+                }
+            }
+        }
+        fclose(dicionario);
     }
+    else
+        printf("Não foi possível abrir o arquivo.\n");
 }
-//-----
+//----------------------------------------------------------------------------------------------------
+
+int remover_arvBB(arv_ingles **ingles, arv_ingles *no)
+{
+    int removeu = 1, verificacao;
+    arv_ingles *aux;
+    arv_ingles *end_filho, *end_menor_filho;
+
+    if((*ingles) != NULL)
+    {
+        if(strcmp((*ingles)->info.ingles, no->info.ingles) == 0)
+        {
+            verificacao = e_folha_BB(*ingles);
+            
+            if(verificacao == 1)
+            {
+                aux = *ingles;
+                *ingles = NULL;
+                free(aux);
+            }
+            else if ((end_filho = so_um_filho_BB(*ingles)) != NULL)
+            {
+                aux = *ingles;
+                *ingles = end_filho;
+                free(aux);
+            }
+                else
+                {
+                    end_menor_filho = menor_filho_BB((*ingles)->dir);
+                    aux = *ingles;
+                    (*ingles)->info = end_menor_filho->info;
+                    removeu = remover_arvBB(&(*ingles)->dir, no);
+                } 
+        }
+        else if(strcmp(no->info.ingles, (*ingles)->info.ingles) < 0)
+                    removeu = remover_arvBB(&((*ingles)->esq), no);        
+            else 
+                removeu = remover_arvBB(&((*ingles)->dir), no);
+                
+    }
+    else removeu = 0;
+    
+    return removeu;
+}
+// arv_ptbr *remover_arvB3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai)
+// {
+
+// }
+//----------------------------------------------------------------------------------------------------()

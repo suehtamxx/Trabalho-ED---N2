@@ -1,0 +1,4 @@
+FUNÇÃO REMOVER
+1. verifica se é folha 
+    2. verifica se tem 2 infos 
+    3. se for info 2, remove. se for info 1, o info 2 passa a ser info 1 e o NINFOS = 1

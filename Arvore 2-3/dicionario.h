@@ -113,7 +113,7 @@ Função e_folha
 
 -> Retorna 1 para folha e 0 para não folha
 */
-int e_folha_BB(arv_ingles *ingles);
+int eh_folha_BB(arv_ingles *ingles);
 /*
 Função e_folha
 
@@ -152,7 +152,7 @@ arv_ptbr *inserir_arvB3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove
 //----------------------------------------------------------------------------------------------------
 
 //----Ler do arquivo
-void ler_arquivo(FILE *dicionario, arv_ptbr **portugues);
+void ler_arquivo(arv_ptbr **portugues);
 //----------------------------------------------------------------------------------------------------
 
 //----Remover no Arvore

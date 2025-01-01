@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "dicionario.h"
+#include <stddef.h>
+#include <sys/types.h>
 
 //-----Criar arvores
 
@@ -19,14 +21,14 @@ arv_ptbr *criar_arvB3()
 
 arv_ingles *cria_no_arvBB()
 {
-    arv_ingles * no;
-    no = (arv_ingles *)malloc(sizeof(arv_ingles));
+    arv_ingles *no; //Cria o nó
+    no = (arv_ingles*)malloc(sizeof(arv_ingles)); //Aloca o nó
 
-    no->dir = NULL;
-    no->esq = NULL;
-    no->info.l_unidade = NULL;
+    no->dir = NULL; //Atribui nulo a direita
+    no->esq = NULL; //Atribui nulo a esquerda
+    no->info.l_unidade = NULL; //Atribui nulo a lista
 
-    return no;
+    return no; //Retorna o nó alocado
 }
 arv_ptbr *criar_no_arvB3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC)
 {
@@ -42,7 +44,7 @@ arv_ptbr *criar_no_arvB3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC)
 }
 //----------------------------------------------------------------------------------------------------
 
-//----Auxiliares da inserir na árvore b3
+//----Auxiliares da inserir na Árvore B3
 
 arv_ptbr *quebra_no(arv_ptbr **no, info_ptbr info, info_ptbr *promove, arv_ptbr *filho)
 {
@@ -96,19 +98,42 @@ arv_ptbr *adiciona_chave(arv_ptbr *no, info_ptbr info, arv_ptbr *filho)
 }
 //----------------------------------------------------------------------------------------------------
 
+//----Auxiliares da inserir na Árvore BB
+
+arv_ingles *so_um_filho_BB(arv_ingles *ingles)
+{
+    arv_ingles *aux; //Cria um nó aux
+    
+    if(ingles->esq != NULL && ingles->dir == NULL) //Se a esquerda for diferente de nulo e a direita for nulo
+        aux = ingles->esq; //O nó aux recebe o filho da esquerda
+    
+    else if(ingles->esq == NULL && ingles->dir != NULL) //Se a esquerda for nula e a direita for diferente de nulo
+        aux = ingles->dir; //O nó aux recebe o filho da direita
+
+    return aux; //Retorna o filho
+}
+arv_ingles *menor_filho_BB(arv_ingles *ingles)
+{
+    while(ingles != NULL && ingles->esq != NULL)
+        ingles = ingles->esq;
+
+    return ingles;
+}
+//----------------------------------------------------------------------------------------------------
+
 //----Verifica se é folha
 
 int eh_folha_BB(arv_ingles *ingles)
 {
-    int verifica = 0;
-    if(ingles->esq == NULL && ingles->dir == NULL)
-        verifica = 1;
+    int verifica = 0; //Cria e inicializa o verifica com 0, ou seja, pressupõe que é nulo
+    if(ingles->esq == NULL && ingles->dir == NULL) //Se a esquerda e a direita forem nula
+        verifica = 1; //Atribui nulo a variável, ou seja, não é nulo
     
-    return verifica;
+    return verifica; //Retorna a verificação
 }
 int eh_folha_B3(arv_ptbr *portugues)
 {
-    int verifica = 0; //Cria e inicializa o verifica com 0
+    int verifica = 0; //Cria e inicializa o verifica com 0, ou seja, pressupõe que é nulo
 
     if(portugues->esq == NULL) //Se a esquerda for nula
         verifica = 1; //Atribui 1 a variável verifica, ou seja, é nulo
@@ -117,26 +142,7 @@ int eh_folha_B3(arv_ptbr *portugues)
 }
 //----------------------------------------------------------------------------------------------------
 
-arv_ingles *so_um_filho_BB(arv_ingles *ingles)
-{
-    arv_ingles *aux;
-    
-    if(ingles->esq != NULL && ingles->dir == NULL)
-        aux = ingles->esq;
-    
-    else if(ingles->esq == NULL && ingles->dir != NULL)
-        aux = ingles->dir;
-
-    return aux;
-}
-
-arv_ingles *menor_filho_BB(arv_ingles *ingles)
-{
-    while(ingles != NULL && ingles->esq != NULL)
-        ingles = ingles->esq;
-
-    return ingles;
-}
+//-----AINDA NÃO SEI
 
 int ninfos_B3(arv_ptbr *portugues)
 {
@@ -146,7 +152,6 @@ int ninfos_B3(arv_ptbr *portugues)
     
     return verifica;
 }
-
 void troca_posicao(arv_ptbr *portugues)
 {
     portugues->info1 = portugues->info2;
@@ -186,8 +191,6 @@ arv_ptbr *inserir_arvB3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove
 
         else //Se não é folha:
         {
-            if(strcmp(info.ptbr, (*portugues)->info1.ptbr) == 0)
-                inserir_arvBB(info.ingles, NULL);
             if(strcmp(info.ptbr, (*portugues)->info1.ptbr) < 0) //Verifica se a nova info é menor q a info1
                 maior = inserir_arvB3(&((*portugues)->esq), info, promove, portugues); //Vai para a sub-árvore esquerda
             
@@ -224,26 +227,30 @@ arv_ptbr *inserir_arvB3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove
 }
 //----------------------------------------------------------------------------------------------------
 
-
 //-----Ler do arquivo
 
-void ler_arquivo(FILE *dicionario, arv_ptbr **portugues)
+void ler_arquivo(arv_ptbr **portugues)
 {
-    dicionario = fopen("dicionario.txt", "r");
+    FILE *dicionario;
+    dicionario = fopen("dicionario.txt", "r"); //Abre o arquivo para leitura
+
     if (dicionario != NULL)
     {
         fseek(dicionario, 0, SEEK_SET);
-        char linha[100]; // Aumente o tamanho se as linhas forem maiores
-        char unidade_atual[100] = "";
 
-        while (fgets(linha, sizeof(linha), dicionario))
+        char *linha = NULL; // Ponteiro para a linha
+        size_t len = 0; // Tamanho da linha
+        ssize_t read; // Número de caracteres lidos
+        int unidade_atual = 0; //Unidade atual
+
+        // Lê cada linha do arquivo
+        while ((read = getline(&linha, &len, dicionario)) != -1)
         {
             linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
 
             if (linha[0] == '%') // Identifica uma unidade
-            {
-                strcpy(unidade_atual, linha + 1); // Copia a unidade atual (sem o '%')
-            }
+                unidade_atual = atoi(&linha[9]);
+            
             else if (strchr(linha, ':')) // Identifica uma linha com tradução
             {
                 char palavra_ingles[100];
@@ -259,7 +266,16 @@ void ler_arquivo(FILE *dicionario, arv_ptbr **portugues)
                     // Preenche a estrutura info_ptbr
                     info_ptbr nova_info;
                     strcpy(nova_info.ptbr, palavra_port); // Português
+                    
+                    // Aloca memória para a árvore em inglês
+                    nova_info.ingles = (arv_ingles *)malloc(sizeof(arv_ingles));
+                    nova_info.ingles->esq = nova_info.ingles->dir = NULL;
                     strcpy(nova_info.ingles->info.ingles, palavra_ingles); // Inglês
+
+                    unidade *nova_unidade = (unidade *)malloc(sizeof(unidade));
+                    nova_unidade->unidade = unidade_atual;
+                    nova_unidade->prox = nova_info.ingles->info.l_unidade;
+                    nova_info.ingles->info.l_unidade = nova_unidade;
 
                     info_ptbr promove; // Para gerenciar possíveis promoções
                     arv_ptbr *pai = NULL;
@@ -271,10 +287,11 @@ void ler_arquivo(FILE *dicionario, arv_ptbr **portugues)
                 }
             }
         }
-        fclose(dicionario);
+        free(linha); // Libera a memória alocada por getline
     }
-    else
-        printf("Não foi possível abrir o arquivo.\n");
+    else printf("Nao foi possivel abrir o arquivo.\n");
+    
+    fclose(dicionario);
 }
 //----------------------------------------------------------------------------------------------------
 
@@ -288,7 +305,7 @@ int remover_arvBB(arv_ingles **ingles, arv_ingles *no)
     {
         if(strcmp((*ingles)->info.ingles, no->info.ingles) == 0)
         {
-            verificacao = e_folha_BB(*ingles);
+            verificacao = eh_folha_BB(*ingles);
             
             if(verificacao == 1)
             {

@@ -32,9 +32,10 @@ typedef struct arvore_portugues
     int nInfos;
 }arv_ptbr;
 
-//----Criar árvores
+//----Alocar nó da Árvore e da Lista
 
-arv_ingles *criar_arvBB();
+unidade *criar_no_l_unid();
+arv_ingles *cria_no_arv_BB();
 /*
 Função criar_no_arvB3
 
@@ -47,25 +48,8 @@ Função criar_no_arvB3
 
 -> Retorna os nó com a info inserida
 */
-arv_ptbr *criar_arvB3();
-//----------------------------------------------------------------------------------------------------
+arv_ptbr *criar_no_arv_B3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC);
 
-//----Alocar nó da árvore
-
-arv_ingles *cria_no_arvBB();
-/*
-Função criar_no_arvB3
-
--> Aloca e adiciona a info no nó com nenhuma info e atruibui 1 ao número de infos
-
--> Parâmetros:
-    info (struct): a info para inserir;
-    filhoC (ponteiro p/ árvore): filho do centro nulo; 
-    filhoE (ponteiro p/ árvore): filho nulo para a esquerda.
-
--> Retorna os nó com a info inserida
-*/
-arv_ptbr *criar_no_arvB3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC);
 //----------------------------------------------------------------------------------------------------
 
 //----Auxiliares da inserir na árvore b3
@@ -84,8 +68,6 @@ Função quebra_no
 -> Retorna o nó com a maior info
 */
 arv_ptbr *quebra_no(arv_ptbr **no, info_ptbr info, info_ptbr *promove, arv_ptbr *filho);
-//----------------------------------------------------------------------------------------------------
-
 /*
 Função adiciona_chave
 
@@ -99,6 +81,7 @@ Função adiciona_chave
 -> Retorna os nó com a info inserida
 */
 arv_ptbr *adiciona_chave(arv_ptbr *no, info_ptbr info, arv_ptbr *filho);
+
 //----------------------------------------------------------------------------------------------------
 
 //----Verifica se é folha
@@ -125,6 +108,7 @@ Função e_folha
 -> Retorna 1 para folha e 0 para não folha
 */
 int eh_folha_B3(arv_ptbr *portugues);
+
 //----------------------------------------------------------------------------------------------------
 
 arv_ingles *so_um_filho_BB(arv_ingles *ingles);
@@ -134,7 +118,8 @@ void troca_posicao(arv_ptbr *portugues);
 
 //----Inserir no Arvore
 
-int inserir_arvBB(arv_ingles **ingles, arv_ingles *no);
+int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no);
+void juntar_arv_BB(arv_ingles **ingles, arv_ingles *no);
 /*
 Função inserir_arvB3
 
@@ -148,19 +133,26 @@ Função inserir_arvB3
 
 -> Retorna a árvore com a nova info inserida
 */
-arv_ptbr *inserir_arvB3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai);
+arv_ptbr *inserir_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai);
+
 //----------------------------------------------------------------------------------------------------
 
 //----Ler do arquivo
+
 void ler_arquivo(arv_ptbr **portugues);
+
 //----------------------------------------------------------------------------------------------------
 
 //----Remover no Arvore
 
-int remover_arvBB(arv_ingles **ingles, arv_ingles *no);
-arv_ptbr *remover_arvB3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai);
+int remover_arv_BB(arv_ingles **ingles, arv_ingles *no);
+arv_ptbr *remover_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai);
+
 //----------------------------------------------------------------------------------------------------
 
+//----Liberar nó
 
+void liberar_arv_BB(arv_ingles *ingles);
+void liberar_arv_B3(arv_ptbr *portugues);
 
 #endif

@@ -5,21 +5,19 @@
 #include <stddef.h>
 #include <sys/types.h>
 
-//-----Criar arvores
+//-----Alocar nó da Árvore e da Lista
 
-arv_ingles *criar_arvBB()
+unidade *criar_no_l_unid()
 {
-    return NULL;
-}
-arv_ptbr *criar_arvB3()
-{
-    return NULL;
-}
-//----------------------------------------------------------------------------------------------------
+    unidade *no; //Cria nó
+    no = (unidade*)malloc(sizeof(unidade)); //Aloca o nó
 
-//-----Alocar nó da Árvore
+    no->unidade = 0; //Atribui 0 a unidade
+    no->prox = NULL; // Atribui nulo ao próximo
 
-arv_ingles *cria_no_arvBB()
+    return no;
+}
+arv_ingles *cria_no_arv_BB()
 {
     arv_ingles *no; //Cria o nó
     no = (arv_ingles*)malloc(sizeof(arv_ingles)); //Aloca o nó
@@ -30,7 +28,7 @@ arv_ingles *cria_no_arvBB()
 
     return no; //Retorna o nó alocado
 }
-arv_ptbr *criar_no_arvB3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC)
+arv_ptbr *criar_no_arv_B3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC)
 {
     arv_ptbr *no; //Cria o nó
     no = (arv_ptbr *)malloc(sizeof(arv_ptbr)); //Aloca o nó
@@ -53,19 +51,19 @@ arv_ptbr *quebra_no(arv_ptbr **no, info_ptbr info, info_ptbr *promove, arv_ptbr 
     if(strcmp(info.ptbr, (*no)->info2.ptbr) > 0) //Se a nova info for maior que a info2 
     {
         *promove = (*no)->info2; //Promove a info2 (sempre sobe a info do meio)
-        maior = criar_no_arvB3(info, (*no)->dir, filho); //Cria um nó só com a nova info (maior info)
+        maior = criar_no_arv_B3(info, (*no)->dir, filho); //Cria um nó só com a nova info (maior info)
     }
 
     else if(strcmp(info.ptbr, (*no)->info1.ptbr) > 0) //Se a nova info for maior que a info1
     {
         *promove = info; //Promove a nova info (sempre sobe a info do meio)
-        maior = criar_no_arvB3((*no)->info2, filho, (*no)->dir); //Cria um nó só com a info2 (maior info)
+        maior = criar_no_arv_B3((*no)->info2, filho, (*no)->dir); //Cria um nó só com a info2 (maior info)
     }
 
     else //Se a nova info for menor que info1
     {
         *promove = (*no)->info1; //Promove a info1 (sempre sobe a info do meio)
-        maior = criar_no_arvB3((*no)->info2, (*no)->cen, (*no)->dir); //Cria um nó com a info2 (maior info)
+        maior = criar_no_arv_B3((*no)->info2, (*no)->cen, (*no)->dir); //Cria um nó com a info2 (maior info)
         (*no)->info1 = info; //Atribui a novo info ao info1
         (*no)->cen = filho; //Atribui nulo ao centro 
     }
@@ -161,62 +159,107 @@ void troca_posicao(arv_ptbr *portugues)
 
 //----Inserir no Arvore
 
-arv_ptbr *inserir_arvB3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai)
+int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
+{
+    int inseriu = 1;
+
+    if(*ingles == NULL)
+        *ingles = no;
+
+    else if(strcmp(no->info.ingles, (*ingles)->info.ingles) > 0)
+        inseriu = inserir_arv_BB(&((*ingles)->dir), no);
+
+        else if(strcmp(no->info.ingles, (*ingles)->info.ingles) < 0)
+            inseriu = inserir_arv_BB(&((*ingles)->esq), no);
+    
+            else inseriu = 0;
+
+    return inseriu;
+}
+void juntar_arv_BB(arv_ingles **ingles, arv_ingles *no)
+{
+    if (no != NULL) 
+    {
+        // Inserir a palavra da árvore de origem na árvore de destino
+        inserir_arv_BB(ingles, no);
+        
+        // Recursivamente inserir as sub-árvores esquerda e direita
+        inserir_arv_BB(ingles, no->esq);
+        inserir_arv_BB(ingles, no->dir);
+    }
+}
+arv_ptbr *inserir_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai)
 {
     info_ptbr promove1; //Cria o promove
     arv_ptbr *maior; //Cria o nó maior
     maior = NULL; //Atribui nulo ao nó maior
+    int encontrou = 0; //Verifica se a palavra em português existe
 
     if(*portugues == NULL) //SE a árvore estiver vazia
-        *portugues = criar_no_arvB3(info, NULL, NULL); //Chama a função criar_no_arvB3
+        *portugues = criar_no_arv_B3(info, NULL, NULL); //Chama a função criar_no_arv_B3
     
     else //SE NÃO:
     {
-        if(eh_folha_B3(*portugues) == 1) //Verifica se é folha
+        if(strcmp(info.ptbr, (*portugues)->info1.ptbr) == 0) //Verifica se a nova info já existe na info1
         {
-            if((*portugues)->nInfos == 1) //Verifica se tem espaço
-                *portugues = adiciona_chave(*portugues, info, NULL); //Se é folha e tem espaço, chama a função adiciona_chave
-            
-            else
-            {
-                maior = quebra_no(portugues, info, promove, NULL); //Se é folha e não tem espaço, chama a função quebra_no
-                
-                if(*pai == NULL) //Se o pai for nulo (quebrou o nó raiz)
-                {
-                    *portugues = criar_no_arvB3(*promove, *portugues, maior); //Chama a função criar_no_arvB3
-                    maior = NULL; //Atribui nulo ao maior
-                }
-            }
+            juntar_arv_BB(&((*portugues)->info1.ingles), info.ingles); //Junta as árvores inglês
+            encontrou = 1;
         }
 
-        else //Se não é folha:
+        else if((*portugues)->nInfos == 2 && strcmp(info.ptbr, (*portugues)->info2.ptbr) == 0) //Se houver mais de 1 info, verifica se a nova info já existe na info2
         {
-            if(strcmp(info.ptbr, (*portugues)->info1.ptbr) < 0) //Verifica se a nova info é menor q a info1
-                maior = inserir_arvB3(&((*portugues)->esq), info, promove, portugues); //Vai para a sub-árvore esquerda
-            
-            else //Se não for menor que a info1
+            juntar_arv_BB(&((*portugues)->info2.ingles), info.ingles);
+            encontrou = 1;
+        }
+        
+        if(!encontrou)
+        {
+            if(eh_folha_B3(*portugues) == 1) //Verifica se é folha
             {
-                if(((*portugues)->nInfos == 1) || (strcmp(info.ptbr, (*portugues)->info2.ptbr) < 0)) //Verifica se tem 1 info ou se a nova info é menor que info2
-                    maior = inserir_arvB3(&((*portugues)->cen), info, promove, portugues); //Vai para a sub-ávore do centro (recursão)
+                if((*portugues)->nInfos == 1) //Verifica se tem espaço
+                    *portugues = adiciona_chave(*portugues, info, NULL); //Se é folha e tem espaço, chama a função adiciona_chave
                 
-                else //Se não for menor que info2
-                    maior = inserir_arvB3(&((*portugues)->dir), info, promove, portugues); //Vai para a sub-árvore direita (recursão)
-                    
-                if(maior != NULL) //Volta da recursão
+                else
                 {
-                    if((*portugues)->nInfos == 1) //Se tiver espaço
+                    maior = quebra_no(portugues, info, promove, NULL); //Se é folha e não tem espaço, chama a função quebra_no
+                    
+                    if(*pai == NULL) //Se o pai for nulo (quebrou o nó raiz)
                     {
-                        *portugues = adiciona_chave(*portugues, *promove, maior); //Chama a função adiciona_chave
+                        *portugues = criar_no_arv_B3(*promove, *portugues, maior); //Chama a função criar_no_arv_B3
                         maior = NULL; //Atribui nulo ao maior
-                    } 
-                    else //Se não tiver espaço
+                    }
+                }
+            }
+
+            else //Se não é folha:
+            {
+                if(strcmp(info.ptbr, (*portugues)->info1.ptbr) < 0) //Verifica se a nova info é menor q a info1
+                    maior = inserir_arv_B3(&((*portugues)->esq), info, promove, portugues); //Vai para a sub-árvore esquerda
+                
+                else //Se não for menor que a info1
+                {
+                    if(((*portugues)->nInfos == 1) || (strcmp(info.ptbr, (*portugues)->info2.ptbr) < 0)) //Verifica se tem 1 info ou se a nova info é menor que info2
+                        maior = inserir_arv_B3(&((*portugues)->cen), info, promove, portugues); //Vai para a sub-ávore do centro (recursão)
+                    
+                    else //Se não for menor que info2
+                        maior = inserir_arv_B3(&((*portugues)->dir), info, promove, portugues); //Vai para a sub-árvore direita (recursão)
+                        
+                    if(maior != NULL) //Volta da recursão
                     {
-                        maior = quebra_no(portugues, *promove, &promove1, maior); //Chama a função quebra_no
-                        *promove = promove1; //Atribui o promove1 ao promove (por causa de recursão)
-                        if(*pai == NULL) //Se o pai for nulo (quebrou o nó raiz)
+                        if((*portugues)->nInfos == 1) //Se tiver espaço
                         {
-                            *portugues = criar_no_arvB3(promove1, *portugues, maior); //Cria um novo nó com a info do promove
+                            *portugues = adiciona_chave(*portugues, *promove, maior); //Chama a função adiciona_chave
                             maior = NULL; //Atribui nulo ao maior
+                        } 
+                        else //Se não tiver espaço
+                        {
+                            maior = quebra_no(portugues, *promove, &promove1, maior); //Chama a função quebra_no
+                            *promove = promove1; //Atribui o promove1 ao promove (por causa de recursão)
+                            if(*pai == NULL) //Se o pai for nulo (quebrou o nó raiz)
+                            {
+                                *portugues = criar_no_arv_B3(promove1, *portugues, maior); //Cria um novo nó com a info do promove
+                                maior = NULL; //Atribui nulo ao maior
+                            }
                         }
                     }
                 }
@@ -236,55 +279,66 @@ void ler_arquivo(arv_ptbr **portugues)
 
     if (dicionario != NULL)
     {
+        printf("Arquivo aberto com sucesso.\n");
         fseek(dicionario, 0, SEEK_SET);
 
         char *linha = NULL; // Ponteiro para a linha
-        size_t len = 0; // Tamanho da linha
-        ssize_t read; // Número de caracteres lidos
-        int unidade_atual = 0; //Unidade atual
+        size_t tam = 0; // Tamanho da linha
+        ssize_t num_c; // Número de caracteres lidos
+        int unidade_atual = 0;
 
         // Lê cada linha do arquivo
-        while ((read = getline(&linha, &len, dicionario)) != -1)
+        while ((num_c = getline(&linha, &tam, dicionario)) != -1)
         {
+            printf("Linha lida (%ld caracteres): %s\n", num_c, linha);
+
             linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
 
             if (linha[0] == '%') // Identifica uma unidade
+            {
                 unidade_atual = atoi(&linha[9]);
-            
+                printf("Unidade atual: %d\n", unidade_atual);
+            }
+
             else if (strchr(linha, ':')) // Identifica uma linha com tradução
             {
                 char palavra_ingles[100];
-                char palavras_portugues[100];
+                char palavras_portugues[200];
 
-                sscanf(linha, "%[^:]: %[^\n]", palavra_ingles, palavras_portugues);
+                // Extrai as partes em inglês e português
+                if (sscanf(linha, "%[^:]: %[^\n]", palavra_ingles, palavras_portugues) == 2) {
+                    // Verifica e remove o ponto e vírgula ao final, se existir
+                    size_t len = strlen(palavras_portugues);
+                    if (len > 0 && palavras_portugues[len - 1] == ';') {
+                        palavras_portugues[len - 1] = '\0'; // Remove o ponto e vírgula
+                    }
 
-                char *palavra_port = strtok(palavras_portugues, ",");
-                while (palavra_port)
-                {
-                    while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
+                    printf("Lido: Ingles = %s, Portugues = %s\n", palavra_ingles, palavras_portugues);
 
-                    // Preenche a estrutura info_ptbr
-                    info_ptbr nova_info;
-                    strcpy(nova_info.ptbr, palavra_port); // Português
-                    
-                    // Aloca memória para a árvore em inglês
-                    nova_info.ingles = (arv_ingles *)malloc(sizeof(arv_ingles));
-                    nova_info.ingles->esq = nova_info.ingles->dir = NULL;
-                    strcpy(nova_info.ingles->info.ingles, palavra_ingles); // Inglês
+                    arv_ingles *novo_no = cria_no_arv_BB();
+                    strcpy(novo_no->info.ingles, palavra_ingles);
+                    novo_no->info.l_unidade = criar_no_l_unid();
+                    novo_no->info.l_unidade->unidade = unidade_atual;
 
-                    unidade *nova_unidade = (unidade *)malloc(sizeof(unidade));
-                    nova_unidade->unidade = unidade_atual;
-                    nova_unidade->prox = nova_info.ingles->info.l_unidade;
-                    nova_info.ingles->info.l_unidade = nova_unidade;
+                    // Processa cada tradução
+                    char *palavra_port = strtok(palavras_portugues, ",");
+                    while (palavra_port)
+                    {
+                        while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
 
-                    info_ptbr promove; // Para gerenciar possíveis promoções
-                    arv_ptbr *pai = NULL;
+                        info_ptbr nova_info;
+                        strcpy(nova_info.ptbr, palavra_port); // Português
+                        nova_info.ingles = novo_no;
 
-                    // Insere na árvore
-                    inserir_arvB3(portugues, nova_info, &promove, &pai);
+                        printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
+                        inserir_arv_B3(portugues, nova_info, NULL, NULL);
 
-                    palavra_port = strtok(NULL, ","); // Próxima palavra
-                }
+                        palavra_port = strtok(NULL, ",");
+
+                        printf("Estado da arvore antes da insercao:\n");
+                        imprimir_arvore_completa(*portugues);
+                    }
+                } else printf("Erro ao processar linha: %s\n", linha);
             }
         }
         free(linha); // Libera a memória alocada por getline
@@ -295,7 +349,7 @@ void ler_arquivo(arv_ptbr **portugues)
 }
 //----------------------------------------------------------------------------------------------------
 
-int remover_arvBB(arv_ingles **ingles, arv_ingles *no)
+int remover_arv_BB(arv_ingles **ingles, arv_ingles *no)
 {
     int removeu = 1, verificacao;
     arv_ingles *aux;
@@ -324,21 +378,62 @@ int remover_arvBB(arv_ingles **ingles, arv_ingles *no)
                     end_menor_filho = menor_filho_BB((*ingles)->dir);
                     aux = *ingles;
                     (*ingles)->info = end_menor_filho->info;
-                    removeu = remover_arvBB(&(*ingles)->dir, no);
+                    removeu = remover_arv_BB(&(*ingles)->dir, no);
                 } 
         }
         else if(strcmp(no->info.ingles, (*ingles)->info.ingles) < 0)
-                    removeu = remover_arvBB(&((*ingles)->esq), no);        
+                    removeu = remover_arv_BB(&((*ingles)->esq), no);        
             else 
-                removeu = remover_arvBB(&((*ingles)->dir), no);
+                removeu = remover_arv_BB(&((*ingles)->dir), no);
                 
     }
     else removeu = 0;
     
     return removeu;
 }
-// arv_ptbr *remover_arvB3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai)
+// arv_ptbr *remover_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai)
 // {
 
 // }
-//----------------------------------------------------------------------------------------------------()
+//----------------------------------------------------------------------------------------------------
+
+
+//----Liberar memória
+
+void liberar_arv_BB(arv_ingles *ingles)
+{
+    if (ingles == NULL)
+        return;
+
+    liberar_arv_BB(ingles->esq);
+    liberar_arv_BB(ingles->dir);
+
+    // Libera a lista de unidades associada ao nó
+    unidade *atual = ingles->info.l_unidade;
+    while (atual != NULL)
+    {
+        unidade *prox = atual->prox;
+        free(atual);
+        atual = prox;
+    }
+
+    free(ingles);
+}
+void liberar_arv_B3(arv_ptbr *portugues)
+{
+     if (portugues == NULL)
+        return;
+
+    liberar_arv_B3(portugues->esq);
+    liberar_arv_B3(portugues->cen);
+    liberar_arv_B3(portugues->dir);
+
+    // Libera a árvore binária de busca associada a info1 e info2, se existir
+    if (portugues->info1.ingles != NULL)
+        liberar_arv_BB(portugues->info1.ingles);
+
+    if (portugues->nInfos == 2 && portugues->info2.ingles != NULL)
+        liberar_arv_BB(portugues->info2.ingles);
+
+    free(portugues);
+}

@@ -166,28 +166,39 @@ int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
     if(*ingles == NULL)
         *ingles = no;
 
+    else if (strcmp(no->info.ingles, (*ingles)->info.ingles) == 0)
+    {
+        unidade *atual;
+        atual = (*ingles)->info.l_unidade;
+
+        while (atual != NULL) 
+            atual = atual->prox;
+
+        atual = no->info.l_unidade;
+    }
+
     else if(strcmp(no->info.ingles, (*ingles)->info.ingles) > 0)
         inseriu = inserir_arv_BB(&((*ingles)->dir), no);
 
-        else if(strcmp(no->info.ingles, (*ingles)->info.ingles) < 0)
-            inseriu = inserir_arv_BB(&((*ingles)->esq), no);
-    
-            else inseriu = 0;
+    else if(strcmp(no->info.ingles, (*ingles)->info.ingles) < 0)
+        inseriu = inserir_arv_BB(&((*ingles)->esq), no);
+
+        else inseriu = 0;
 
     return inseriu;
 }
-void juntar_arv_BB(arv_ingles **ingles, arv_ingles *no)
-{
-    if (no != NULL) 
-    {
-        // Inserir a palavra da árvore de origem na árvore de destino
-        inserir_arv_BB(ingles, no);
+// void juntar_arv_BB(arv_ingles **ingles, arv_ingles *no)
+// {
+//     if (no != NULL) 
+//     {
+//         // Inserir a palavra da árvore de origem na árvore de destino
+//         inserir_arv_BB(ingles, no);
         
-        // Recursivamente inserir as sub-árvores esquerda e direita
-        inserir_arv_BB(ingles, no->esq);
-        inserir_arv_BB(ingles, no->dir);
-    }
-}
+//         // Recursivamente inserir as sub-árvores esquerda e direita
+//         // inserir_arv_BB(ingles, no->esq);
+//         // inserir_arv_BB(ingles, no->dir);
+//     }
+// }
 arv_ptbr *inserir_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai)
 {
     info_ptbr promove1; //Cria o promove
@@ -201,14 +212,14 @@ arv_ptbr *inserir_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promov
     else //SE NÃO:
     {
         if(strcmp(info.ptbr, (*portugues)->info1.ptbr) == 0) //Verifica se a nova info já existe na info1
-        {
-            juntar_arv_BB(&((*portugues)->info1.ingles), info.ingles); //Junta as árvores inglês
+        {   
+            if(inserir_arv_BB(&((*portugues)->info1.ingles), info.ingles) == 0) printf("Nao foi possivel inserir na arvBB\n"); //Junta as árvores inglês
             encontrou = 1;
         }
 
         else if((*portugues)->nInfos == 2 && strcmp(info.ptbr, (*portugues)->info2.ptbr) == 0) //Se houver mais de 1 info, verifica se a nova info já existe na info2
         {
-            juntar_arv_BB(&((*portugues)->info2.ingles), info.ingles);
+            if(inserir_arv_BB(&((*portugues)->info2.ingles), info.ingles) == 0) printf("Nao foi possivel inserir na arvBB\n");
             encontrou = 1;
         }
         
@@ -315,30 +326,40 @@ void ler_arquivo(arv_ptbr **portugues)
 
                     printf("Lido: Ingles = %s, Portugues = %s\n", palavra_ingles, palavras_portugues);
 
-                    arv_ingles *novo_no = cria_no_arv_BB();
-                    strcpy(novo_no->info.ingles, palavra_ingles);
-                    novo_no->info.l_unidade = criar_no_l_unid();
-                    novo_no->info.l_unidade->unidade = unidade_atual;
-
-                    // Processa cada tradução
-                    char *palavra_port = strtok(palavras_portugues, ",");
-                    while (palavra_port)
+                    arv_ingles *novo_no;
+                    novo_no = cria_no_arv_BB();
+                    if (novo_no != NULL)
                     {
-                        while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
+                        strcpy(novo_no->info.ingles, palavra_ingles);
+                        novo_no->info.l_unidade = criar_no_l_unid();
+                        novo_no->info.l_unidade->unidade = unidade_atual;
 
-                        info_ptbr nova_info;
-                        strcpy(nova_info.ptbr, palavra_port); // Português
-                        nova_info.ingles = novo_no;
+                        // Processa cada tradução
+                        char *palavra_port = strtok(palavras_portugues, ",");
+                        while (palavra_port)
+                        {
+                            while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
 
-                        printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
-                        inserir_arv_B3(portugues, nova_info, NULL, NULL);
+                            info_ptbr nova_info;
+                            strcpy(nova_info.ptbr, palavra_port); // Português
+                            nova_info.ingles = novo_no;
+                            
+                            info_ptbr promove; // Para gerenciar possíveis promoções
+                            arv_ptbr *pai = NULL;
 
-                        palavra_port = strtok(NULL, ",");
+                            printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
+                            inserir_arv_B3(portugues, nova_info, &promove, &pai);
 
-                        printf("Estado da arvore antes da insercao:\n");
-                        imprimir_arvore_completa(*portugues);
-                    }
-                } else printf("Erro ao processar linha: %s\n", linha);
+                            palavra_port = strtok(NULL, ",");
+
+                            // printf("Estado da arvore antes da insercao:\n");
+                            // imprimir_arvore_completa(*portugues);
+                        }
+                        // liberar_arv_BB(novo_no);
+                    } 
+                    else printf("Erro de alocacao\n");
+                } 
+                else printf("Erro ao processar linha: %s\n", linha);
             }
         }
         free(linha); // Libera a memória alocada por getline

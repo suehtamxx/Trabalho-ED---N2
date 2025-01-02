@@ -12,7 +12,8 @@ void imprimir_arvore_ingles(arv_ingles *ingles)
 
     printf("\tIngles: %s\n", ingles->info.ingles);
 
-    unidade *unid = ingles->info.l_unidade;
+    unidade *unid;
+    unid = ingles->info.l_unidade;
     while (unid != NULL)
     {
         printf("\t\tUnidade: %d\n", unid->unidade);

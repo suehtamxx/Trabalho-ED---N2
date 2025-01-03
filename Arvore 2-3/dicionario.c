@@ -187,18 +187,6 @@ int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
 
     return inseriu;
 }
-// void juntar_arv_BB(arv_ingles **ingles, arv_ingles *no)
-// {
-//     if (no != NULL) 
-//     {
-//         // Inserir a palavra da árvore de origem na árvore de destino
-//         inserir_arv_BB(ingles, no);
-        
-//         // Recursivamente inserir as sub-árvores esquerda e direita
-//         // inserir_arv_BB(ingles, no->esq);
-//         // inserir_arv_BB(ingles, no->dir);
-//     }
-// }
 arv_ptbr *inserir_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai)
 {
     info_ptbr promove1; //Cria o promove
@@ -301,7 +289,7 @@ void ler_arquivo(arv_ptbr **portugues)
         // Lê cada linha do arquivo
         while ((num_c = getline(&linha, &tam, dicionario)) != -1)
         {
-            printf("Linha lida (%ld caracteres): %s\n", num_c, linha);
+            printf("\nLinha lida (%d caracteres): %s\n", num_c, linha);
 
             linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
 
@@ -343,17 +331,11 @@ void ler_arquivo(arv_ptbr **portugues)
                             info_ptbr nova_info;
                             strcpy(nova_info.ptbr, palavra_port); // Português
                             nova_info.ingles = novo_no;
-                            
-                            info_ptbr promove; // Para gerenciar possíveis promoções
-                            arv_ptbr *pai = NULL;
 
                             printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
-                            inserir_arv_B3(portugues, nova_info, &promove, &pai);
+                            inserir_arv_B3(portugues, nova_info, NULL, NULL);
 
                             palavra_port = strtok(NULL, ",");
-
-                            // printf("Estado da arvore antes da insercao:\n");
-                            // imprimir_arvore_completa(*portugues);
                         }
                         // liberar_arv_BB(novo_no);
                     } 

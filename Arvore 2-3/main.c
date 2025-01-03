@@ -27,6 +27,8 @@ void imprimir_arvore_B3(arv_ptbr *portugues, int nivel)
     if (portugues == NULL)
         return;
 
+    imprimir_arvore_B3(portugues->esq, nivel + 1);
+    
     // Indentação para representar o nível da árvore
     for (int i = 0; i < nivel; i++)
         printf("  ");
@@ -45,7 +47,6 @@ void imprimir_arvore_B3(arv_ptbr *portugues, int nivel)
     }
 
     // Chamada recursiva para os filhos esquerdo, central e direito
-    imprimir_arvore_B3(portugues->esq, nivel + 1);
     imprimir_arvore_B3(portugues->cen, nivel + 1);
     imprimir_arvore_B3(portugues->dir, nivel + 1);
 }

@@ -35,11 +35,11 @@ typedef struct arvore_portugues
     int cor;
 }arv_ptbr;
 
-arv_ingles *criar_arvBB();
-arv_ptbr *criar_arvRN();
-
+unidade *criar_no_l_unid();
 arv_ingles *criar_no_arvBB();
 arv_ptbr *criar_no_arvRN();
 
+void remove_no(arv_ptbr *no, char valor);
+int remove_arvRN(arv_ptbr *no, char valor);
 void inserir_arvRN(arv_ptbr **R, arv_ptbr *no);
 #endif

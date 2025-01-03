@@ -283,42 +283,30 @@ arv_ptbr *inserir_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promov
 
 //-----Ler do arquivo
 
-void ler_arquivo(arv_ptbr **portugues)
-{
+void ler_arquivo(arv_ptbr **portugues) {
     FILE *dicionario;
-    dicionario = fopen("dicionario.txt", "r"); //Abre o arquivo para leitura
+    dicionario = fopen("dicionario.txt", "r"); // Abre o arquivo para leitura
 
-    if (dicionario != NULL)
-    {
+    if (dicionario != NULL) {
         printf("Arquivo aberto com sucesso.\n");
         fseek(dicionario, 0, SEEK_SET);
 
-        char *linha = NULL; // Ponteiro para a linha
-        size_t tam = 0; // Tamanho da linha
-        ssize_t num_c; // Número de caracteres lidos
+        char *linha = NULL;
+        size_t tam = 0;
+        ssize_t num_c;
         int unidade_atual = 0;
 
-        // Lê cada linha do arquivo
-        while ((num_c = getline(&linha, &tam, dicionario)) != -1)
-        {
-            printf("Linha lida (%ld caracteres): %s\n", num_c, linha);
-
+        while ((num_c = getline(&linha, &tam, dicionario)) != -1) {
             linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
 
-            if (linha[0] == '%') // Identifica uma unidade
-            {
+            if (linha[0] == '%') { // Identifica uma unidade
                 unidade_atual = atoi(&linha[9]);
                 printf("Unidade atual: %d\n", unidade_atual);
-            }
-
-            else if (strchr(linha, ':')) // Identifica uma linha com tradução
-            {
+            } else if (strchr(linha, ':')) { // Identifica uma linha com tradução
                 char palavra_ingles[100];
                 char palavras_portugues[200];
 
-                // Extrai as partes em inglês e português
                 if (sscanf(linha, "%[^:]: %[^\n]", palavra_ingles, palavras_portugues) == 2) {
-                    // Verifica e remove o ponto e vírgula ao final, se existir
                     size_t len = strlen(palavras_portugues);
                     if (len > 0 && palavras_portugues[len - 1] == ';') {
                         palavras_portugues[len - 1] = '\0'; // Remove o ponto e vírgula
@@ -328,44 +316,39 @@ void ler_arquivo(arv_ptbr **portugues)
 
                     arv_ingles *novo_no;
                     novo_no = cria_no_arv_BB();
-                    if (novo_no != NULL)
-                    {
+                    if (novo_no != NULL) {
                         strcpy(novo_no->info.ingles, palavra_ingles);
                         novo_no->info.l_unidade = criar_no_l_unid();
                         novo_no->info.l_unidade->unidade = unidade_atual;
 
                         // Processa cada tradução
                         char *palavra_port = strtok(palavras_portugues, ",");
-                        while (palavra_port)
-                        {
+                        while (palavra_port) {
                             while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
 
                             info_ptbr nova_info;
-                            strcpy(nova_info.ptbr, palavra_port); // Português
+                            strcpy(nova_info.ptbr, palavra_port);
                             nova_info.ingles = novo_no;
-                            
-                            info_ptbr promove; // Para gerenciar possíveis promoções
+
+                            info_ptbr promove;
                             arv_ptbr *pai = NULL;
 
                             printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
                             inserir_arv_B3(portugues, nova_info, &promove, &pai);
 
                             palavra_port = strtok(NULL, ",");
-
-                            // printf("Estado da arvore antes da insercao:\n");
-                            // imprimir_arvore_completa(*portugues);
                         }
-                        // liberar_arv_BB(novo_no);
-                    } 
-                    else printf("Erro de alocacao\n");
-                } 
-                else printf("Erro ao processar linha: %s\n", linha);
+                    } else printf("Erro de alocacao\n");
+                } else {
+                    printf("Erro ao processar linha: %s\n", linha);
+                }
             }
         }
-        free(linha); // Libera a memória alocada por getline
+        free(linha);
+    } else {
+        printf("Nao foi possivel abrir o arquivo.\n");
     }
-    else printf("Nao foi possivel abrir o arquivo.\n");
-    
+
     fclose(dicionario);
 }
 //----------------------------------------------------------------------------------------------------

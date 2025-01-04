@@ -20,11 +20,13 @@ unidade *criar_no_l_unid()
 arv_ingles *cria_no_arv_BB()
 {
     arv_ingles *no; //Cria o nó
-    no = (arv_ingles*)malloc(sizeof(arv_ingles)); //Aloca o nó
-
-    no->dir = NULL; //Atribui nulo a direita
-    no->esq = NULL; //Atribui nulo a esquerda
-    no->info.l_unidade = NULL; //Atribui nulo a lista
+    no = (arv_ingles *)malloc(sizeof(arv_ingles)); //Aloca o nó
+    if(no != NULL)
+    {
+        no->info.l_unidade = NULL; //Atribui nulo a lista
+        no->dir = NULL; //Atribui nulo a direita
+        no->esq = NULL; //Atribui nulo a esquerda
+    }
 
     return no; //Retorna o nó alocado
 }
@@ -32,11 +34,12 @@ arv_ptbr *criar_no_arv_B3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC)
 {
     arv_ptbr *no; //Cria o nó
     no = (arv_ptbr *)malloc(sizeof(arv_ptbr)); //Aloca o nó
-
-    no->info1 = info; //Atribui a struct
-    no->esq = filhoE; //Atribui o filho da esquerda
-    no->cen = filhoC; //Atribui o filho da direita
-    no->nInfos = 1; //Atribui 1 ao número de infos
+    if(no != NULL){
+        no->info1 = info; //Atribui a struct
+        no->esq = filhoE; //Atribui o filho da esquerda
+        no->cen = filhoC; //Atribui o filho da direita
+        no->nInfos = 1; //Atribui 1 ao número de infos
+    }
 
     return (no); //Retorna o nó alocado
 }
@@ -47,6 +50,7 @@ arv_ptbr *criar_no_arv_B3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC)
 arv_ptbr *quebra_no(arv_ptbr **no, info_ptbr info, info_ptbr *promove, arv_ptbr *filho)
 {
     arv_ptbr *maior; //Cria o nó maior
+    maior = NULL;
 
     if(strcmp(info.ptbr, (*no)->info2.ptbr) > 0) //Se a nova info for maior que a info2 
     {
@@ -276,20 +280,20 @@ void ler_arquivo(arv_ptbr **portugues)
     FILE *dicionario;
     dicionario = fopen("dicionario.txt", "r"); //Abre o arquivo para leitura
 
-    if (dicionario != NULL)
-    {
-        printf("Arquivo aberto com sucesso.\n");
-        fseek(dicionario, 0, SEEK_SET);
-
         char *linha = NULL; // Ponteiro para a linha
         size_t tam = 0; // Tamanho da linha
         ssize_t num_c; // Número de caracteres lidos
         int unidade_atual = 0;
+    if (dicionario != NULL)
+    {
+        printf("Arquivo aberto com sucesso.\n");
+        //fseek(dicionario, 0, SEEK_SET);
+
 
         // Lê cada linha do arquivo
         while ((num_c = getline(&linha, &tam, dicionario)) != -1)
         {
-            printf("\nLinha lida (%d caracteres): %s\n", num_c, linha);
+            printf("\nLinha lida (%ld caracteres): %s\n", num_c, linha);
 
             linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
 
@@ -314,40 +318,46 @@ void ler_arquivo(arv_ptbr **portugues)
 
                     printf("Lido: Ingles = %s, Portugues = %s\n", palavra_ingles, palavras_portugues);
 
-                    arv_ingles *novo_no;
-                    novo_no = cria_no_arv_BB();
-                    if (novo_no != NULL)
-                    {
-                        strcpy(novo_no->info.ingles, palavra_ingles);
-                        novo_no->info.l_unidade = criar_no_l_unid();
-                        novo_no->info.l_unidade->unidade = unidade_atual;
 
                         // Processa cada tradução
                         char *palavra_port = strtok(palavras_portugues, ",");
                         while (palavra_port)
                         {
-                            while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
+                            arv_ingles *novo_no;
+                            novo_no = cria_no_arv_BB();
+                            if (novo_no != NULL)
+                            {
+                                strcpy(novo_no->info.ingles, palavra_ingles);
+                                novo_no->info.l_unidade = criar_no_l_unid();
+                                novo_no->info.l_unidade->unidade = unidade_atual;
 
-                            info_ptbr nova_info;
-                            strcpy(nova_info.ptbr, palavra_port); // Português
-                            nova_info.ingles = novo_no;
+                                while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
 
-                            printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
-                            inserir_arv_B3(portugues, nova_info, NULL, NULL);
+                                info_ptbr nova_info;
+                                strcpy(nova_info.ptbr, palavra_port); // Português
+                                nova_info.ingles = novo_no;
 
-                            palavra_port = strtok(NULL, ",");
+                                info_ptbr promove;
+                                arv_ptbr *pai;
+                                pai = NULL;
+
+                                printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
+                                inserir_arv_B3(portugues, nova_info, &promove, &pai);
+
+                                palavra_port = strtok(NULL, ",");
+
+                            } 
+                            else printf("Erro de alocacao\n");
+                        //liberar_arv_BB(novo_no);
                         }
-                        // liberar_arv_BB(novo_no);
-                    } 
-                    else printf("Erro de alocacao\n");
                 } 
                 else printf("Erro ao processar linha: %s\n", linha);
             }
         }
-        free(linha); // Libera a memória alocada por getline
     }
     else printf("Nao foi possivel abrir o arquivo.\n");
     
+    free(linha); // Libera a memória alocada por getline
     fclose(dicionario);
 }
 //----------------------------------------------------------------------------------------------------
@@ -403,40 +413,37 @@ int remover_arv_BB(arv_ingles **ingles, arv_ingles *no)
 
 //----Liberar memória
 
-void liberar_arv_BB(arv_ingles *ingles)
-{
-    if (ingles == NULL)
-        return;
-
-    liberar_arv_BB(ingles->esq);
-    liberar_arv_BB(ingles->dir);
-
-    // Libera a lista de unidades associada ao nó
-    unidade *atual = ingles->info.l_unidade;
-    while (atual != NULL)
-    {
+void liberar_lista_unidades(unidade *l_unidade) {
+    unidade *atual = l_unidade;
+    while (atual != NULL) {
         unidade *prox = atual->prox;
         free(atual);
         atual = prox;
     }
-
-    free(ingles);
 }
-void liberar_arv_B3(arv_ptbr *portugues)
-{
-     if (portugues == NULL)
-        return;
 
-    liberar_arv_B3(portugues->esq);
-    liberar_arv_B3(portugues->cen);
-    liberar_arv_B3(portugues->dir);
+// Função para liberar a árvore de inglês
+void liberar_arv_BB(arv_ingles *no) {
+    if (no != NULL) {
+        // Libera as subárvores recursivamente
+            liberar_arv_BB(no->esq);
+            liberar_arv_BB(no->dir);
 
-    // Libera a árvore binária de busca associada a info1 e info2, se existir
-    if (portugues->info1.ingles != NULL)
-        liberar_arv_BB(portugues->info1.ingles);
+        // Libera a lista de unidades associada ao nó
+        liberar_lista_unidades(no->info.l_unidade);
 
-    if (portugues->nInfos == 2 && portugues->info2.ingles != NULL)
-        liberar_arv_BB(portugues->info2.ingles);
-
-    free(portugues);
+        // Libera o nó atual
+        free(no);
+    }
+}
+void liberar_arv_B3(arv_ptbr *no) {
+    if (no != NULL) {
+        // Libera as subárvores recursivamente
+            liberar_arv_B3(no->esq);
+            liberar_arv_B3(no->cen);
+            if(no->nInfos == 2)
+                liberar_arv_B3(no->dir);
+            
+        free(no);
+    }
 }

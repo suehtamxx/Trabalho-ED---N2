@@ -52,6 +52,9 @@ int cor(arv_ptbr *no)
 void trocarCor(arv_ptbr *no)
 {
     if(no != NULL)
+    {
+        
+    }
 }
 void inserir_arvRN(arv_ptbr **R, arv_ptbr *no)
 {

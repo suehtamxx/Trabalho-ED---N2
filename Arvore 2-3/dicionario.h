@@ -143,10 +143,29 @@ void ler_arquivo(arv_ptbr **portugues);
 
 //----------------------------------------------------------------------------------------------------
 
+//----Auxiliares da remover na árvore b3
+
+//Recebe um No Folha e o seu Pai e remove quando No é esquerda do Pai
+int remove_esq_folha(arv_ptbr **portugues, arv_ptbr **pai);
+//Recebe um No Folha e o seu pai, remove quando o No é o centro do pai
+int remove_centro_folha(arv_ptbr **portugues, arv_ptbr **pai);
+//Recebe um No folha e o seu pai, remove quando o No é a direita do Pai
+void remove_dir_folha(arv_ptbr **portugues, arv_ptbr **pai);
+//Remove o No quando é folha, recebe o No que vai ter seu valor removido e o No Pai, depois remove o No
+int remove_folha(arv_ptbr **Pai, arv_ptbr **portugues, char palavra);
+//Recebe o No e a Info, remove o valor do No quando os filhos do No são folhas
+int remove_no_filho_folhas(arv_ptbr **portugues, char info);
+//Recebe um No e um valor para balanceiaArvore, ver em que lado da portugues esta desbalanceado entao balanceia o No
+int balanceia_arv_B3(arv_ptbr **portugues, int desbalanceamento);
+//FUNÇÃO QUE RECEBE UM NO E PERCORRE A PARTIR DELE BUSCANDO A MENOR INFORMAÇÃO PARA REMOVER E RETORNAR NA VARIAVEL promove
+int remove_menor_no(arv_ptbr **pai_aux, arv_ptbr **No, info_ptbr *promove);
+
+//----------------------------------------------------------------------------------------------------
+
 //----Remover no Arvore
 
 int remover_arv_BB(arv_ingles **ingles, arv_ingles *no);
-arv_ptbr *remover_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai);
+int remover_arv_B3(arv_ptbr **pai, arv_ptbr **portugues, char info, int *flag);
 
 //----------------------------------------------------------------------------------------------------
 

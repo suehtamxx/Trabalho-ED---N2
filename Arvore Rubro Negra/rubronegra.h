@@ -39,7 +39,17 @@ unidade *criar_no_l_unid();
 arv_ingles *criar_no_arvBB();
 arv_ptbr *criar_no_arvRN();
 
-void remove_no(arv_ptbr *no, char valor);
-int remove_arvRN(arv_ptbr *no, char valor);
+int cor(arv_ptbr *no);
+void trocaCor(arv_ptbr *no);
+
 void inserir_arvRN(arv_ptbr **R, arv_ptbr *no);
+void move2EsqRed(arv_ptbr **r);
+void move2DirRed(arv_ptbr **r);
+arv_ptbr *balancear(arv_ptbr *r);
+arv_ptbr *removeMenor(arv_ptbr *no);
+arv_ptbr *procuraMenor(arv_ptbr *no);
+
+
+arv_ptbr *remove_no(arv_ptbr *no, char *valor);
+int remove_arvRN(arv_ptbr **no, char *valor);
 #endif

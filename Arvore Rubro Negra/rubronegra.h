@@ -42,6 +42,7 @@ arv_ptbr *criar_no_arvRN();
 int cor(arv_ptbr *no);
 void trocaCor(arv_ptbr *no);
 
+int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no);
 void inserir_arvRN(arv_ptbr **R, arv_ptbr *no);
 void move2EsqRed(arv_ptbr **r);
 void move2DirRed(arv_ptbr **r);
@@ -52,4 +53,7 @@ arv_ptbr *procuraMenor(arv_ptbr *no);
 
 arv_ptbr *remove_no(arv_ptbr *no, char *valor);
 int remove_arvRN(arv_ptbr **no, char *valor);
+void liberar_arv_BB(arv_ingles *no);
+void liberar_arvRN(arv_ptbr *no);
+void liberar_lista_unidades(unidade *l_unidade);
 #endif

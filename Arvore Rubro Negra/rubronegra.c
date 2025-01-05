@@ -100,6 +100,36 @@ void rotacionaDir(arv_ptbr **no)
     (*no)->cor = 2;
     (*no) = aux;
 }
+
+int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
+{
+    int inseriu = 1;
+
+    if(*ingles == NULL)
+        *ingles = no;
+
+    else if (strcmp(no->info.ingles, (*ingles)->info.ingles) == 0)
+    {
+        unidade *atual;
+        atual = (*ingles)->info.l_unidade;
+
+        while (atual != NULL) 
+            atual = atual->prox;
+
+        atual = no->info.l_unidade;
+    }
+
+    else if(strcmp(no->info.ingles, (*ingles)->info.ingles) > 0)
+        inseriu = inserir_arv_BB(&((*ingles)->dir), no);
+
+    else if(strcmp(no->info.ingles, (*ingles)->info.ingles) < 0)
+        inseriu = inserir_arv_BB(&((*ingles)->esq), no);
+
+        else inseriu = 0;
+
+    return inseriu;
+}
+
 void inserir_arvRN(arv_ptbr **R, arv_ptbr *no)
 {
     if(*R == NULL)
@@ -107,7 +137,10 @@ void inserir_arvRN(arv_ptbr **R, arv_ptbr *no)
 
     else{
         if(strcmp(no->info.ptbr, (*R)->info.ptbr) == 0)
-            inserir_arvBB()
+        {
+            if(inserir_arv_BB(&((*R)->info.ingles), no->info.ingles) == 0) 
+                printf("nao foi possivel inserir na arvBB!");
+        }
         if(strcmp(no->info.ptbr, (*R)->info.ptbr) < 0)
             inserir_arvRN(&((*R)->esq), no);
         else if(strcmp(no->info.ptbr, (*R)->info.ptbr) > 0)
@@ -332,4 +365,38 @@ void ler_arquivo(arv_ptbr **portugues)
     // Libera recursos
     free(linha); // Libera o buffer alocado pelo getline
     fclose(dicionario); // Fecha o arquivo
+}
+
+void liberar_lista_unidades(unidade *l_unidade) {
+    unidade *atual = l_unidade;
+    while (atual != NULL) {
+        unidade *prox = atual->prox;
+        free(atual);
+        atual = prox;
+    }
+}
+
+void liberar_arv_BB(arv_ingles *no) 
+{
+    if (no != NULL) {
+        // Libera as subárvores recursivamente
+            liberar_arv_BB(no->esq);
+            liberar_arv_BB(no->dir);
+
+        // Libera a lista de unidades associada ao nó
+        liberar_lista_unidades(no->info.l_unidade);
+
+        // Libera o nó atual
+        free(no);
+    }
+}
+void liberar_arvRN(arv_ptbr *no)
+{
+    if(no != NULL)
+    {
+        liberar_arvRN(no->esq);
+        liberar_arvRN(no->dir);
+
+        free(no);
+    }
 }

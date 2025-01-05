@@ -146,14 +146,6 @@ int eh_folha_B3(arv_ptbr *portugues)
 
 //-----AINDA NÃO SEI
 
-int ninfos_B3(arv_ptbr *portugues)
-{
-    int verifica = 0;
-    if(portugues->nInfos == 2)
-        verifica = 1;
-    
-    return verifica;
-}
 void troca_posicao(arv_ptbr *portugues)
 {
     portugues->info1 = portugues->info2;
@@ -172,13 +164,13 @@ int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
 
     else if (strcmp(no->info.ingles, (*ingles)->info.ingles) == 0)
     {
-        unidade *atual;
-        atual = (*ingles)->info.l_unidade;
+        unidade *nova_unidade = no->info.l_unidade;
 
-        while (atual != NULL) 
-            atual = atual->prox;
+        // Adiciona a nova unidade no início da lista
+        nova_unidade->prox = (*ingles)->info.l_unidade;
+        (*ingles)->info.l_unidade = nova_unidade;
 
-        atual = no->info.l_unidade;
+        
     }
 
     else if(strcmp(no->info.ingles, (*ingles)->info.ingles) > 0)
@@ -293,7 +285,7 @@ void ler_arquivo(arv_ptbr **portugues)
         // Lê cada linha do arquivo
         while ((num_c = getline(&linha, &tam, dicionario)) != -1)
         {
-            printf("\nLinha lida (%ld caracteres): %s\n", num_c, linha);
+            printf("\nLinha lida (%d caracteres): %s\n", num_c, linha);
 
             linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
 
@@ -391,7 +383,7 @@ int remove_esq_folha(arv_ptbr **portugues, arv_ptbr **pai)
 
         else
         {
-			adicionaNo(&(**pai).cen, (**pai).dir->info1, NULL);
+			adiciona_chave(&(**pai).cen, (**pai).dir->info1, NULL);
 			libera_No(&(**pai).dir);
 	       	(**pai).nInfos = 1;
 		}

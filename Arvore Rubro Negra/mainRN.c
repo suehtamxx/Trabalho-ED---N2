@@ -72,8 +72,8 @@ int main() {
     imprimir_arvore_BST_ingles(arvore_binaria);
 
     // Liberação de memória seria realizada aqui, caso necessário
-    // liberar_arvore_rubro_negra(arvore_rubro_negra);
-    // liberar_arvore_binaria(arvore_binaria);
+    liberar_arvRN(dicionario_portugues);
+    liberar_arv_BB(arvore_binaria);
 
     return 0;
 }

@@ -63,12 +63,17 @@ int main()
 {
     arv_ptbr *dicionario_portugues;
     dicionario_portugues = NULL;
+    // char ptbr[100] = "rede de relacionamento";
+    // int flag = 0;
     
     // Chama a função para ler o arquivo e construir a árvore
     ler_arquivo(&dicionario_portugues);
 
     // Imprime a árvore para verificar se a leitura está correta
     imprimir_arvore_23_B3(dicionario_portugues, 0);
+
+    printf("Imprimindo\n\n");
+    imprimir_unid_B3(dicionario_portugues, 1);
 
     liberar_arv_B3(dicionario_portugues);
 

@@ -141,6 +141,9 @@ arv_ptbr *inserir_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promov
 
 void ler_arquivo(arv_ptbr **portugues);
 
+void imprimir_arvore_ingles(arv_ingles *ingles);
+void imprimir_arvore_B3(arv_ptbr *portugues, int nivel);
+void imprimir_arvore_completa(arv_ptbr *portugues);
 //----------------------------------------------------------------------------------------------------
 
 //----Remover no Arvore

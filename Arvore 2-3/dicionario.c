@@ -171,10 +171,19 @@ int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
         unidade *atual;
         atual = (*ingles)->info.l_unidade;
 
-        while (atual != NULL) 
+        while (atual != NULL && atual->prox != NULL) 
             atual = atual->prox;
 
-        atual = no->info.l_unidade;
+        if (atual == NULL) 
+        {
+            // Se a lista estava vazia, coloca a unidade diretamente
+            (*ingles)->info.l_unidade = no->info.l_unidade;
+        } 
+        else 
+        {
+            // Se a lista não estava vazia, adiciona no final
+            atual->prox = no->info.l_unidade;
+        }
     }
 
     else if(strcmp(no->info.ingles, (*ingles)->info.ingles) > 0)
@@ -332,14 +341,18 @@ void ler_arquivo(arv_ptbr **portugues)
                             strcpy(nova_info.ptbr, palavra_port); // Português
                             nova_info.ingles = novo_no;
 
+                            info_ptbr promove;
+                            arv_ptbr *pai = NULL;
+
                             printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
-                            inserir_arv_B3(portugues, nova_info, NULL, NULL);
+                            inserir_arv_B3(portugues, nova_info, &promove, &pai);
+                            imprimir_arvore_completa(*portugues);
 
                             palavra_port = strtok(NULL, ",");
                         }
-                        // liberar_arv_BB(novo_no);
                     } 
                     else printf("Erro de alocacao\n");
+                    //liberar_arv_BB(novo_no);
                 } 
                 else printf("Erro ao processar linha: %s\n", linha);
             }
@@ -352,6 +365,57 @@ void ler_arquivo(arv_ptbr **portugues)
 }
 //----------------------------------------------------------------------------------------------------
 
+void imprimir_arvore_ingles(arv_ingles *ingles)
+{
+    if (ingles == NULL)
+        return;
+
+    printf("\tIngles: %s\n", ingles->info.ingles);
+
+    unidade *unid;
+    unid = ingles->info.l_unidade;
+    while (unid != NULL)
+    {
+        printf("\t\tUnidade: %d\n", unid->unidade);
+        unid = unid->prox;
+    }
+}
+
+// Função recursiva para imprimir a árvore B3
+void imprimir_arvore_B3(arv_ptbr *portugues, int nivel)
+{
+    if (portugues == NULL)
+        return;
+
+    imprimir_arvore_B3(portugues->esq, nivel + 1);
+    
+    // Indentação para representar o nível da árvore
+    for (int i = 0; i < nivel; i++)
+        printf("  ");
+
+    // Imprime a informação do primeiro campo
+    printf("Portugues 1: %s\n", portugues->info1.ptbr);
+    imprimir_arvore_ingles(portugues->info1.ingles);
+
+    // Se houver segunda informação, imprime-a
+    if (portugues->nInfos == 2)
+    {
+        for (int i = 0; i < nivel; i++)
+            printf("  ");
+        printf("Portugues 2: %s\n", portugues->info2.ptbr);
+        imprimir_arvore_ingles(portugues->info2.ingles);
+    }
+
+    // Chamada recursiva para os filhos esquerdo, central e direito
+    imprimir_arvore_B3(portugues->cen, nivel + 1);
+    imprimir_arvore_B3(portugues->dir, nivel + 1);
+}
+
+// Função para imprimir a árvore a partir da raiz
+void imprimir_arvore_completa(arv_ptbr *portugues)
+{
+    imprimir_arvore_B3(portugues, 0);
+}
 int remover_arv_BB(arv_ingles **ingles, arv_ingles *no)
 {
     int removeu = 1, verificacao;

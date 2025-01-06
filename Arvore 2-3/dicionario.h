@@ -36,103 +36,41 @@ typedef struct arvore_portugues
 
 unidade *criar_no_l_unid();
 arv_ingles *cria_no_arv_BB();
-/*
-Função criar_no_arvB3
-
--> Aloca e adiciona a info no nó com nenhuma info e atruibui 1 ao número de infos
-
--> Parâmetros:
-    info (struct): a info para inserir;
-    filhoC (ponteiro p/ árvore): filho do centro nulo; 
-    filhoE (ponteiro p/ árvore): filho nulo para a esquerda.
-
--> Retorna os nó com a info inserida
-*/
+// Aloca e adiciona a info no nó com nenhuma info e atruibui 1 ao número de infos
 arv_ptbr *criar_no_arv_B3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC);
 
 //----------------------------------------------------------------------------------------------------
 
 //----Auxiliares da inserir na árvore b3
 
-/*
-Função quebra_no
-
--> Cria um novo nó com a maior info, atualiza o promove e o número de infos
-
--> Parâmetros:
-    no (ponteiro para ponteiro p/ árvore): nó que será quebrado; 
-    info (struct): a info para inserir no nó;
-    promove (ponteiro p/ árvore): info que será inserida no nó pai;
-    filho (ponteiro p/ árvore): filho nulo.
-
--> Retorna o nó com a maior info
-*/
+// Cria um novo nó com a maior info, atualiza o promove e o número de infos
 arv_ptbr *quebra_no(arv_ptbr **no, info_ptbr info, info_ptbr *promove, arv_ptbr *filho);
-/*
-Função adiciona_chave
-
--> Adiciona a info no nó já com 1 info e atualiza o número de infos
-
--> Parâmetros;
-    no (ponteiro p/ árvore): nó onde a info será inserida; 
-    info (struct): a info para inserir;
-    filho (ponteiro p/ árvore): filho nulo.
-
--> Retorna os nó com a info inserida
-*/
+// Adiciona a info no nó já com 1 info e atualiza o número de infos
 arv_ptbr *adiciona_chave(arv_ptbr *no, info_ptbr info, arv_ptbr *filho);
+
+//----------------------------------------------------------------------------------------------------
+
+//----Auxiliares da inserir na Árvore BB
+
+arv_ingles *so_um_filho_BB(arv_ingles *ingles);
+arv_ingles *menor_filho_BB(arv_ingles *ingles);
 
 //----------------------------------------------------------------------------------------------------
 
 //----Verifica se é folha
 
-/*
-Função e_folha
-
--> Verifica se o nó é uma folha da ávore binária
-
--> Parâmetro;
-    portugues(pornteiro p/ árvore): nó a ser verificado.
-
--> Retorna 1 para folha e 0 para não folha
-*/
+// Verifica se o nó é uma folha da ávore binária
 int eh_folha_BB(arv_ingles *ingles);
-/*
-Função e_folha
-
--> Verifica se o nó é uma folha da árvore b3
-
--> Parâmetro;
-    portugues(ponteiro p/ árvore): nó a ser verificado.
-
--> Retorna 1 para folha e 0 para não folha
-*/
+// Verifica se o nó é uma folha da árvore b3
 int eh_folha_B3(arv_ptbr *portugues);
 
 //----------------------------------------------------------------------------------------------------
 
-arv_ingles *so_um_filho_BB(arv_ingles *ingles);
-arv_ingles *menor_filho_BB(arv_ingles *ingles);
-int ninfos_B3(arv_ptbr *portugues);
-void troca_posicao(arv_ptbr *portugues);
+//----Inserir nó nas Árvores
 
-//----Inserir no Arvore
-
+// Insere uma nova informação na árvore binária
 int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no);
-void juntar_arv_BB(arv_ingles **ingles, arv_ingles *no);
-/*
-Função inserir_arvB3
-
--> Insere uma nova indormação na árvore
-
--> Parâmetros:
-    portugues (ponteiro para ponteiro p/ árvore): raíz da árvore;
-    info (struct): a info para inserir;
-    promove (ponteiro p/ árvore): info que será inserida no nó pai; 
-    pai (ponteiro para ponteiro p/ árvore): pai da variável portugues.
-
--> Retorna a árvore com a nova info inserida
-*/
+// Insere uma nova informação na árvore b3
 arv_ptbr *inserir_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promove, arv_ptbr **pai);
 
 //----------------------------------------------------------------------------------------------------
@@ -143,35 +81,56 @@ void ler_arquivo(arv_ptbr **portugues);
 
 //----------------------------------------------------------------------------------------------------
 
+//----Imprimir de acordo com a unidade
+
+void imprimir_unid_BB(arv_ingles *ingles, int unidade, char *palavra);
+void imprimir_unid_B3(arv_ptbr *portugues, int unidade);
+
+//----------------------------------------------------------------------------------------------------
+
+//----Imprimir de acordo com a palavra em português
+void imprimir_ptbr_BB(arv_ingles *ingles);
+void imprimir_ptbr_B3(arv_ptbr *portugues, char *palavra);
+
+//----------------------------------------------------------------------------------------------------
+
 //----Auxiliares da remover na árvore b3
 
-//Recebe um No Folha e o seu Pai e remove quando No é esquerda do Pai
+// Libera o nó da árvore b3
+void libera_no(arv_ptbr **No);
+// Recebe um nó folha e o seu pai e remove quando nó é esquerda do pai
 int remove_esq_folha(arv_ptbr **portugues, arv_ptbr **pai);
-//Recebe um No Folha e o seu pai, remove quando o No é o centro do pai
+// Recebe um nó folha e o seu pai, remove quando o nó é o centro do pai
 int remove_centro_folha(arv_ptbr **portugues, arv_ptbr **pai);
-//Recebe um No folha e o seu pai, remove quando o No é a direita do Pai
+// Recebe um nó folha e o seu pai, remove quando o nó é a direita do pai
 void remove_dir_folha(arv_ptbr **portugues, arv_ptbr **pai);
-//Remove o No quando é folha, recebe o No que vai ter seu valor removido e o No Pai, depois remove o No
-int remove_folha(arv_ptbr **Pai, arv_ptbr **portugues, char palavra);
-//Recebe o No e a Info, remove o valor do No quando os filhos do No são folhas
-int remove_no_filho_folhas(arv_ptbr **portugues, char info);
-//Recebe um No e um valor para balanceiaArvore, ver em que lado da portugues esta desbalanceado entao balanceia o No
+// Remove o nó quando é folha, recebe o nó que vai ter seu valor removido e o nó pai, depois remove o nó
+int remove_folha(arv_ptbr **Pai, arv_ptbr **portugues, char *palavra);
+// Recebe o nó e a palavra em português, remove o valor do nó quando os filhos do nó são folhas
+int remove_no_filho_folhas(arv_ptbr **portugues, char *palavra);
+// Recebe um nó e um valor para balanceia_arv_B3, ver em que lado da português esta desbalanceado então balanceia o nó
 int balanceia_arv_B3(arv_ptbr **portugues, int desbalanceamento);
-//FUNÇÃO QUE RECEBE UM NO E PERCORRE A PARTIR DELE BUSCANDO A MENOR INFORMAÇÃO PARA REMOVER E RETORNAR NA VARIAVEL promove
+// FUNÇÃO QUE RECEBE UM NO E PERCORRE A PARTIR DELE BUSCANDO A MENOR INFORMAÇÃO PARA REMOVER E RETORNAR NA VARIAVEL promove
 int remove_menor_no(arv_ptbr **pai_aux, arv_ptbr **No, info_ptbr *promove);
 
 //----------------------------------------------------------------------------------------------------
 
-//----Remover no Arvore
+//----Remover nó nas Árvores
 
 int remover_arv_BB(arv_ingles **ingles, arv_ingles *no);
-int remover_arv_B3(arv_ptbr **pai, arv_ptbr **portugues, char info, int *flag);
+int remover_arv_B3(arv_ptbr **pai, arv_ptbr **portugues, char *palavra, int *flag);
 
 //----------------------------------------------------------------------------------------------------
 
-//----Liberar nó
+//----Liberar memória da árvore completa
 
+// Liberar a lista de unidades
+void liberar_lista_unid(unidade *l_unidade);
+// Liberar a árvore de BB
 void liberar_arv_BB(arv_ingles *ingles);
+// Liberar a árvore B3
 void liberar_arv_B3(arv_ptbr *portugues);
+
+//----------------------------------------------------------------------------------------------------
 
 #endif

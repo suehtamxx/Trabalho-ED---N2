@@ -4,60 +4,44 @@
 #include "dicionario.h"
 #include "dicionario.c"
 
-// Função auxiliar para imprimir as informações de uma árvore em inglês
-void imprimir_arvore_BST_ingles(arv_ingles *ingles) {
-    if (ingles == NULL)
-        return;
+void imprimir_arvore_ingles(arv_ingles *ingles) 
+{
+    if (ingles != NULL)
+    {
+        printf("\tIngles: %s\n", ingles->info.ingles);
 
-    // Imprime informações do nó atual (raiz)
-    printf("\tIngles: %s\n", ingles->info.ingles);
+        unidade *unid;
+        unid = ingles->info.l_unidade;
+        while (unid != NULL) 
+        {
+            printf("\t\tUnidade: %d\n", unid->unidade);
+            unid = unid->prox;
+        }
+        printf("\n");
 
-    // Imprime a lista de unidades associadas
-    unidade *unid = ingles->info.l_unidade;
-    while (unid != NULL) {
-        printf("\t\tUnidade: %d\n", unid->unidade);
-        unid = unid->prox;
+        imprimir_arvore_ingles(ingles->esq);
+        imprimir_arvore_ingles(ingles->dir);
     }
-
-    // Subárvore esquerda
-    imprimir_arvore_BST_ingles(ingles->esq);
-
-    // Subárvore direita
-    imprimir_arvore_BST_ingles(ingles->dir);
 }
+void imprimir_arvore_B3(arv_ptbr *portugues) 
+{
+    if (portugues != NULL)
+    {
+        imprimir_arvore_B3(portugues->esq);
 
-// Função recursiva para imprimir a árvore B3
-void imprimir_arvore_23_B3(arv_ptbr *portugues, int nivel) {
-    if (portugues == NULL)
-        return;
+        printf("Portugues: %s\n", portugues->info1.ptbr);
+        imprimir_arvore_ingles(portugues->info1.ingles);
 
-    imprimir_arvore_23_B3(portugues->esq, nivel + 1);
-    // Imprime a primeira informação da raiz
-    for (int i = 0; i < nivel; i++)
-        printf("  ");
-    printf("Portugues 1: %s\n", portugues->info1.ptbr);
-
-    // Imprime a árvore de inglês associada à primeira informação
-    imprimir_arvore_BST_ingles(portugues->info1.ingles);
-
-    // Se houver uma segunda informação, imprime-a
-    if (portugues->nInfos == 2) {
-        for (int i = 0; i < nivel; i++)
-            printf("  ");
-        printf("Portugues 2: %s\n", portugues->info2.ptbr);
-        imprimir_arvore_BST_ingles(portugues->info2.ingles);
+        if (portugues->nInfos == 2)
+        {
+            printf("Portugues: %s\n", portugues->info2.ptbr);
+            imprimir_arvore_ingles(portugues->info2.ingles);
+            imprimir_arvore_B3(portugues->dir); //DESCOBRI O ERRO DA IMPRESSÂO AQUI            //
+        }
+        
+        imprimir_arvore_B3(portugues->cen);
     }
-
-    // Subárvore esquerda
-
-    // Subárvore central
-    imprimir_arvore_23_B3(portugues->cen, nivel + 1);
-
-    // Subárvore direita
-    imprimir_arvore_23_B3(portugues->dir, nivel + 1);
 }
-
-// Função para imprimir a árvore a partir da raiz
 
 int main()
 {
@@ -68,7 +52,11 @@ int main()
     ler_arquivo(&dicionario_portugues);
 
     // Imprime a árvore para verificar se a leitura está correta
-    imprimir_arvore_23_B3(dicionario_portugues, 0);
+    imprimir_arvore_B3(dicionario_portugues);
+
+    printf("\n_______________________\n");
+    //imprimir_unid_B3(dicionario_portugues, 2);
+    //imprimir_ptbr_B3(dicionario_portugues, "bicicleta");
 
     liberar_arv_B3(dicionario_portugues);
 

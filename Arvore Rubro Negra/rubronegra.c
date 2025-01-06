@@ -505,7 +505,7 @@ void funcaoauxIII(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni)
     int verificacao = 0;
     if(*no != NULL)
     {
-        funcaoIII(no, palavra, uni);
+        funcaoIII(&(*no)->info.ingles, palavra, uni);
 
         if((*no)->info.ingles == NULL)
         {
@@ -519,7 +519,7 @@ void funcaoauxIII(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni)
             funcaoauxIII(&(*no)->dir, portugues, palavra, uni);
     }
 }
-void funcaoIII(arv_ptbr **no, char *palavra, int uni)
+void funcaoIII(arv_ingles **no, char *palavra, int uni)
 {
     if(*no != NULL)
     {
@@ -529,9 +529,10 @@ void funcaoIII(arv_ptbr **no, char *palavra, int uni)
         unidade *anterior = NULL;
         aux = NULL;
 
-        atual = (*no)->info.ingles;
+        atual = *no;
         aux = atual->info.l_unidade;
 
+        printf("Palavra: %s e Ingles: %s\n", palavra, atual->info.ingles);
         if(strcmp(palavra, atual->info.ingles) == 0)
         {
             while(aux != NULL)
@@ -539,17 +540,15 @@ void funcaoIII(arv_ptbr **no, char *palavra, int uni)
                 if(uni == aux->unidade)
                 {
                     if (anterior == NULL)
-                        atual->info.l_unidade = aux->prox; // Atualiza o início da lista
+                        atual->info.l_unidade = aux->prox; 
                     else 
-                        anterior->prox = aux->prox; // Remove unidade no meio/fim
-                    
+                        anterior->prox = aux->prox; 
 
-                    free(aux); // Libera a memória da unidade
+                    free(aux); 
                     aux = (anterior == NULL) ? atual->info.l_unidade : anterior->prox;
 
-                    // Verifica se não restam unidades e remove a palavra em inglês
                     if (atual->info.l_unidade == NULL) {
-                        removeuBB = remover_arv_BB(&(*no)->info.ingles, atual);
+                        removeuBB = remover_arv_BB(&(*no), atual);
                         if (removeuBB == 1)
                             printf("Palavra removida da árvore binária: %s\n", atual->info.ingles);
                         else
@@ -561,6 +560,10 @@ void funcaoIII(arv_ptbr **no, char *palavra, int uni)
                 }
             }
         }
+        if(*no != NULL)
+            funcaoIII(&(*no)->esq, palavra, uni);
+        if(*no != NULL)
+            funcaoIII(&(*no)->dir, palavra, uni);
     }
 }
 void liberar_lista_unidades(unidade *l_unidade) {

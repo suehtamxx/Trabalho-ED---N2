@@ -50,16 +50,14 @@ int main() {
     char *palavra;
     palavra = (char *)malloc(sizeof(char));
     int unidade = 0;
-    //int verificacao = 0;
-
      // Imprime a árvore Rubro-Negra (português) e Binária (inglês)
     //printf("Árvore Rubro-Negra de Português:\n");
     //imprimir_arvore_rubro_negra(dicionario_portugues, 0);
 
     //printf("informe um elemento para ser removido: ");
-    //scanf(" %s", *valor);
+    //scanf(" %s", valor);
 
-    //verificacao = remove_arvRN(&dicionario_portugues, *valor);
+    //verificacao = remove_arvRN(&dicionario_portugues, valor);
     //if(verificacao == 1)printf("elemento removido");
     //else printf("elemento nao foi removido");
 
@@ -68,7 +66,7 @@ int main() {
     printf("informe a unidade: \n");
     scanf("%d", &unidade);
 
-    funcaoIII(&dicionario_portugues, palavra, unidade);
+    funcaoauxIII(&dicionario_portugues, &dicionario_portugues, palavra, unidade);
 
     imprimir_arvore_rubro_negra(dicionario_portugues, 0);
 

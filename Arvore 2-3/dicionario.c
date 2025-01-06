@@ -142,23 +142,7 @@ int eh_folha_B3(arv_ptbr *portugues)
 
     return verifica; //Retorna a verificação
 }
-//----------------------------------------------------------------------------------------------------
 
-//-----AINDA NÃO SEI
-
-int ninfos_B3(arv_ptbr *portugues)
-{
-    int verifica = 0;
-    if(portugues->nInfos == 2)
-        verifica = 1;
-    
-    return verifica;
-}
-void troca_posicao(arv_ptbr *portugues)
-{
-    portugues->info1 = portugues->info2;
-    portugues->nInfos = 1;
-}
 //----------------------------------------------------------------------------------------------------
 
 //----Inserir no Arvore
@@ -177,8 +161,9 @@ int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
         // Adiciona a nova unidade no início da lista
         nova_unidade->prox = (*ingles)->info.l_unidade;
         (*ingles)->info.l_unidade = nova_unidade;
-        
-        
+
+        no->info.l_unidade = NULL;
+        free(no);
     }
 
     else if(strcmp(no->info.ingles, (*ingles)->info.ingles) > 0)
@@ -271,6 +256,7 @@ arv_ptbr *inserir_arv_B3(arv_ptbr **portugues, info_ptbr info, info_ptbr *promov
     }
     return (maior); //Retorna maior
 }
+
 //----------------------------------------------------------------------------------------------------
 
 //-----Ler do arquivo
@@ -283,7 +269,7 @@ void ler_arquivo(arv_ptbr **portugues)
         char *linha = NULL; // Ponteiro para a linha
         size_t tam = 0; // Tamanho da linha
         ssize_t num_c; // Número de caracteres lidos
-        int unidade_atual = 0;
+        int atual = 0;
     if (dicionario != NULL)
     {
         printf("Arquivo aberto com sucesso.\n");
@@ -293,14 +279,14 @@ void ler_arquivo(arv_ptbr **portugues)
         // Lê cada linha do arquivo
         while ((num_c = getline(&linha, &tam, dicionario)) != -1)
         {
-            printf("\nLinha lida (%ld caracteres): %s\n", num_c, linha);
+            printf("\nLinha lida (%d caracteres): %s\n", num_c, linha);
 
             linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
 
             if (linha[0] == '%') // Identifica uma unidade
             {
-                unidade_atual = atoi(&linha[9]);
-                printf("Unidade atual: %d\n", unidade_atual);
+                atual = atoi(&linha[9]);
+                printf("Unidade atual: %d\n", atual);
             }
 
             else if (strchr(linha, ':')) // Identifica uma linha com tradução
@@ -329,7 +315,7 @@ void ler_arquivo(arv_ptbr **portugues)
                             {
                                 strcpy(novo_no->info.ingles, palavra_ingles);
                                 novo_no->info.l_unidade = criar_no_l_unid();
-                                novo_no->info.l_unidade->unidade = unidade_atual;
+                                novo_no->info.l_unidade->unidade = atual;
 
                                 while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
 
@@ -343,7 +329,7 @@ void ler_arquivo(arv_ptbr **portugues)
 
                                 printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
                                 inserir_arv_B3(portugues, nova_info, &promove, &pai);
-
+                                
                                 palavra_port = strtok(NULL, ",");
 
                             } 
@@ -360,9 +346,93 @@ void ler_arquivo(arv_ptbr **portugues)
     free(linha); // Libera a memória alocada por getline
     fclose(dicionario);
 }
+
 //----------------------------------------------------------------------------------------------------
 
-//Recebe um No Folha e o seu Pai e remove quando No é esquerda do Pai
+//----Imprimir de acordo com a unidade
+
+void imprimir_unid_BB(arv_ingles *ingles, int unid, char *palavra)
+{
+    if (ingles != NULL)
+    {
+        unidade *atual;
+        atual = ingles->info.l_unidade;
+        while (atual != NULL)
+        {
+            if (atual->unidade == unid)
+            {
+                printf("Portugues: %s\n", palavra);
+                printf("\tIngles: %s\n", ingles->info.ingles);
+            }
+            
+            atual = atual->prox; 
+            printf("\n");
+        }
+
+        imprimir_unid_BB(ingles->esq, unid, palavra);
+        imprimir_unid_BB(ingles->dir, unid, palavra);
+    }
+}
+void imprimir_unid_B3(arv_ptbr *portugues, int unid)
+{
+    if (portugues != NULL)
+    {
+        imprimir_unid_B3(portugues->esq, unid);
+
+        imprimir_unid_BB(portugues->info1.ingles, unid, portugues->info1.ptbr); 
+        if (portugues->nInfos == 2)
+            imprimir_unid_BB(portugues->info2.ingles, unid, portugues->info2.ptbr);
+                  
+        imprimir_unid_B3(portugues->cen, unid);
+        imprimir_unid_B3(portugues->dir, unid);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+
+//----Imprimir de acordo com a palavra em português
+
+void imprimir_ptbr_BB(arv_ingles *ingles)
+{
+    if (ingles != NULL)
+    {
+        printf("%s\n", ingles->info.ingles);
+
+        imprimir_ptbr_BB(ingles->esq);
+        imprimir_ptbr_BB(ingles->dir);
+    }
+}
+void imprimir_ptbr_B3(arv_ptbr *portugues, char *palavra)
+{
+    if (portugues != NULL)
+    {
+        imprimir_ptbr_B3(portugues->esq, palavra);
+
+        if (strcmp(portugues->info1.ptbr, palavra) == 0)
+            imprimir_ptbr_BB(portugues->info1.ingles);
+        
+        
+        if (portugues->nInfos == 2 && strcmp(portugues->info2.ptbr, palavra) == 0)
+            imprimir_ptbr_BB(portugues->info2.ingles);
+                  
+        imprimir_ptbr_B3(portugues->cen, palavra);
+        imprimir_ptbr_B3(portugues->dir, palavra);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+
+//----Auxiliares da remover na árvore b3
+
+void libera_no(arv_ptbr **No)
+{
+
+	arv_ptbr *aux;
+
+	aux = *No;
+	*No = NULL;
+	free(aux);
+}
 int remove_esq_folha(arv_ptbr **portugues, arv_ptbr **pai)
 {										
 	int flag = 0;
@@ -391,27 +461,25 @@ int remove_esq_folha(arv_ptbr **portugues, arv_ptbr **pai)
 
         else
         {
-			adicionaNo(&(**pai).cen, (**pai).dir->info1, NULL);
-			libera_No(&(**pai).dir);
+			(**pai).cen = adiciona_chave((**pai).cen, (**pai).dir->info1, NULL);
+			libera_no(&(**pai).dir);
 	       	(**pai).nInfos = 1;
 		}
 	}
-	//caso em que o pai e seus filhos so tem uma info, entao ao remover o valor a arvore fica desbalanceada	
+	//caso em que o pai e seus filhos so tem uma info, entao ao remover_arv_B3 o valor a arvore fica desbalanceada	
     else
     {
-		adicionaNo(pai, (**pai).cen->info1, NULL);
+		*pai = adiciona_chave(*pai, (**pai).cen->info1, NULL);
 
 		(**pai).nInfos = 2;
 
-		libera_No(&(**pai).esq);
-		libera_No(&(**pai).cen);
+		libera_no(&(**pai).esq);
+		libera_no(&(**pai).cen);
 		flag = 1;
 	}
-	//retorna 0 se ao remover a arvore nao foi desbalanceada, retorna 1 se foi desbalanceada
+	//retorna 0 se ao remover_arv_B3 a arvore nao foi desbalanceada, retorna 1 se foi desbalanceada
 	return flag; 
 }
-
-//Recebe um No Folha e o seu pai, remove quando o No é o centro do pai
 int remove_centro_folha(arv_ptbr **portugues, arv_ptbr **pai)
 {
 
@@ -437,27 +505,25 @@ int remove_centro_folha(arv_ptbr **portugues, arv_ptbr **pai)
         
         else
         {
-			adicionaNo(&(**pai).cen, (**pai).dir->info1, NULL);
-			libera_No(&(**pai).dir);
+			(*pai)->cen = adiciona_chave((*pai)->cen, (**pai).dir->info1, NULL);
+			libera_no(&(**pai).dir);
 	       	(**pai).nInfos = 1;
 		}
 	}
-	//caso em que o pai e seus filhos so tem uma info, entao a ao remover o valor a arvore fica desbalanceada
+	//caso em que o pai e seus filhos so tem uma info, entao a ao remover_arv_B3 o valor a arvore fica desbalanceada
     else
     {
-		adicionaNo(pai, (**pai).esq->info1, NULL);
+		*pai = adiciona_chave(*pai, (**pai).esq->info1, NULL);
 
 		(**pai).nInfos = 2;
 
-		libera_No(&(**pai).esq);
-		libera_No(&(**pai).dir);
+		libera_no(&(**pai).esq);
+		libera_no(&(**pai).dir);
 		flag = 1;
 	}
-	//retorna 0 se ao remover a arvore nao foi desbalanceada, retorna 1 se foi desbalanceada
+	//retorna 0 se ao remover_arv_B3 a arvore nao foi desbalanceada, retorna 1 se foi desbalanceada
 	return flag; 
 }
-
-//Recebe um No folha e o seu pai, remove quando o No é a direita do Pai
 void remove_dir_folha(arv_ptbr **portugues, arv_ptbr **pai)
 {
 	(**portugues).info1 = (**pai).info2;
@@ -481,14 +547,12 @@ void remove_dir_folha(arv_ptbr **portugues, arv_ptbr **pai)
     
     else
     {
-		adicionaNo(&(**pai).cen,(**pai).info2,NULL);
+		(*pai)->cen = adiciona_chave((*pai)->cen,(**pai).info2,NULL);
 		(**pai).nInfos = 1;
-		libera_No(&(**pai).dir);
+		libera_no(&(**pai).dir);
 	}
 }
-
-//Remove o No quando é folha, recebe o No que vai ter seu valor removido e o No Pai, depois remove o No
-int remove_folha(arv_ptbr **Pai, arv_ptbr **portugues, char palavra)
+int remove_folha(arv_ptbr **Pai, arv_ptbr **portugues, char *palavra)
 {
 	int balanceamento = 0;
 
@@ -503,7 +567,7 @@ int remove_folha(arv_ptbr **Pai, arv_ptbr **portugues, char palavra)
 	}
     
     else if (*Pai == NULL)
-		libera_No(portugues);	
+		libera_no(portugues);	
 				
 	else
     {
@@ -519,13 +583,11 @@ int remove_folha(arv_ptbr **Pai, arv_ptbr **portugues, char palavra)
 
 	return balanceamento;
 }
-
-//Recebe o No e a Info, remove o valor do No quando os filhos do No são folhas
-int remove_no_filho_folhas(arv_ptbr **portugues, char info)
+int remove_no_filho_folhas(arv_ptbr **portugues, char *palavra)
 {
 	int balanceamento = 0;
 
-	if((strcmp((*portugues)->info1.ptbr, info) == 0)) //remove quando a info é a info1 do No
+	if((strcmp((*portugues)->info1.ptbr, palavra) == 0)) //remove quando a info é a info1 do No
     { 		
 		if((**portugues).cen->nInfos == 2)
         {
@@ -535,7 +597,7 @@ int remove_no_filho_folhas(arv_ptbr **portugues, char info)
 
 		}
         
-        else if((strcmp((*portugues)->info1.ptbr, info) == 0))
+        else if((strcmp((*portugues)->info1.ptbr, palavra) == 0))
         {
 			(**portugues).info1 = (**portugues).esq->info2;
    			(**portugues).esq->nInfos = 1;
@@ -555,20 +617,20 @@ int remove_no_filho_folhas(arv_ptbr **portugues, char info)
             
             else
             {
-				adicionaNo(&(**portugues).cen, (**portugues).dir->info1, NULL);
+				(*portugues)->cen = adiciona_chave((*portugues)->cen, (**portugues).dir->info1, NULL);
 				(**portugues).nInfos = 1;
-				libera_No(&(**portugues).dir);
+				libera_no(&(**portugues).dir);
 			}
 		}
-		//caso em que o pai e seus filhos so tem uma info, entao ao remover o valor a arvore fica desbalanceada
+		//caso em que o pai e seus filhos so tem uma info, entao ao remover_arv_B3 o valor a arvore fica desbalanceada
         else
         { 	 
 		  	arv_ptbr *aux;
 
-			adicionaNo(&(**portugues).esq, (**portugues).cen->info1, NULL);
+			(*portugues)->esq = adiciona_chave((*portugues)->esq, (**portugues).cen->info1, NULL);
 			aux = (**portugues).esq;
-			libera_No(&(**portugues).cen);
-			libera_No(portugues);
+			libera_no(&(**portugues).cen);
+			libera_no(portugues);
 			*portugues = aux;
 			balanceamento = 1;
 		}
@@ -601,16 +663,14 @@ int remove_no_filho_folhas(arv_ptbr **portugues, char info)
 
 		else
         {
-			adicionaNo(&(**portugues).cen, (**portugues).dir->info1, NULL);
+			(*portugues)->cen = adiciona_chave((*portugues)->cen, (**portugues).dir->info1, NULL);
 			(**portugues).nInfos = 1;
-			libera_No(&(**portugues).dir);
+			libera_no(&(**portugues).dir);
 		}
 	}
-	//retorna 0 se ao remover a arvore nao foi desbalanceada, retorna 1 se foi desbalanceada
+	//retorna 0 se ao remover_arv_B3 a arvore nao foi desbalanceada, retorna 1 se foi desbalanceada
 	return balanceamento; 					 
 }
-
-//Recebe um No e um valor para balanceiaArvore, ver em que lado da portugues esta desbalanceado entao balanceia o No
 int balanceia_arv_B3(arv_ptbr **portugues, int desbalanceamento)
 { 
 	info_ptbr promove;
@@ -624,14 +684,14 @@ int balanceia_arv_B3(arv_ptbr **portugues, int desbalanceamento)
 		
 		if((*portugues)->cen->nInfos == 1)
         {
-			adicionaNo(&(*portugues)->cen,(*portugues)->info1, aux);
+			(*portugues)->cen = adiciona_chave((*portugues)->cen,(*portugues)->info1, aux);
 			(*portugues)->esq = NULL;
 			
 			if((*portugues)->nInfos == 1)
             {
 				aux = *portugues;
 				*portugues = (*portugues)->cen;
-				libera_No(&aux);
+				libera_no(&aux);
 			}
             
             else
@@ -646,7 +706,7 @@ int balanceia_arv_B3(arv_ptbr **portugues, int desbalanceamento)
         
         else
         {
-			quebraNo(&(*portugues)->cen,(*portugues)->info1, &promove, &no_maior, aux);
+			no_maior = quebra_no(&(*portugues)->cen,(*portugues)->info1, &promove, aux);
 			(*portugues)->info1 = promove;
 			(*portugues)->esq = (*portugues)->cen;
 			(*portugues)->cen = no_maior;
@@ -657,14 +717,14 @@ int balanceia_arv_B3(arv_ptbr **portugues, int desbalanceamento)
     {
 		if((*portugues)->esq->nInfos == 1)
         {
-			adicionaNo(&(*portugues)->esq, (*portugues)->info1, (*portugues)->cen);
+			(*portugues)->esq = adiciona_chave((*portugues)->esq, (*portugues)->info1, (*portugues)->cen);
 			(*portugues)->cen = NULL;
 			
 			if((*portugues)->nInfos == 1)
             {				
 				aux = *portugues;
 				*portugues = (*portugues)->esq;
-				libera_No(&aux);
+				libera_no(&aux);
 			}
             
             else
@@ -679,7 +739,7 @@ int balanceia_arv_B3(arv_ptbr **portugues, int desbalanceamento)
         
         else
         {
-			quebraNo(&(*portugues)->esq, (*portugues)->info1, &promove, &no_maior, (*portugues)->cen);
+			no_maior = quebra_no(&(*portugues)->esq, (*portugues)->info1, &promove, (*portugues)->cen);
 			(*portugues)->info1 = promove;
 			(*portugues)->cen = no_maior;
 		}
@@ -690,14 +750,14 @@ int balanceia_arv_B3(arv_ptbr **portugues, int desbalanceamento)
     {
 		if((*portugues)->cen->nInfos == 1)
         {
-			adicionaNo(&(*portugues)->cen, (*portugues)->info2, (*portugues)->dir);
+			(*portugues)->cen = adiciona_chave((*portugues)->cen, (*portugues)->info2, (*portugues)->dir);
 			(*portugues)->nInfos = 1;
 			(*portugues)->dir = NULL;
 		}
         
         else
         {
-			quebraNo(&(*portugues)->cen, (*portugues)->info2, &promove, &no_maior, (*portugues)->dir);
+			no_maior = quebra_no(&(*portugues)->cen, (*portugues)->info2, &promove, (*portugues)->dir);
 			(*portugues)->info2 = promove;
 			(*portugues)->dir = no_maior;
 		}
@@ -705,14 +765,12 @@ int balanceia_arv_B3(arv_ptbr **portugues, int desbalanceamento)
 
 	return 0;
 }
-
-//FUNÇÃO QUE RECEBE UM NO E PERCORRE A PARTIR DELE BUSCANDO A MENOR INFORMAÇÃO PARA REMOVER E RETORNAR NA VARIAVEL promove
 int remove_menor_no(arv_ptbr **pai_aux, arv_ptbr **No, info_ptbr *promove)
 {
 	int balanceamento = 0;
 
 	if ((*No)->esq != NULL)
-        balanceamento = remove_MenorNo(No, &(*No)->esq, promove);
+        balanceamento = remove_menor_no(No, &(*No)->esq, promove);
 	
     else
     {
@@ -723,23 +781,11 @@ int remove_menor_no(arv_ptbr **pai_aux, arv_ptbr **No, info_ptbr *promove)
 	return balanceamento;
 }
 
-/*  remover recebe a portugues o pai que incia com NULL a info que desejamos remover e flag
-    a remoção pode ser feita atravez de 3 casos
-   
-    1- se o No é folha
-   
-    2- se os filhos do No são folhas
+//----------------------------------------------------------------------------------------------------
 
-    3- se os filhos do No não são folhas, nesse caso é buscado o menor info da direita
-    da info que queremos remover e fazemos com que a info que queremos remover receba 
-    a menor info da sua direita;
+//----Remover nó nas Árvores
 
-    apos a remoção da info a arvore pode ter ficado desbalanceado, entao se o valor
-    da variavel balanceamento for 1, quer dizer que teremos que balancear o No,
-	então é chamada a funçao balanceiaArvore para isso
-*/
-
-int remover_arv_BB(arv_ingles **ingles, arv_ingles *no)
+int remover_arv_B3_arv_BB(arv_ingles **ingles, arv_ingles *no)
 {
     int removeu = 1, verificacao;
     arv_ingles *aux;
@@ -768,35 +814,35 @@ int remover_arv_BB(arv_ingles **ingles, arv_ingles *no)
                     end_menor_filho = menor_filho_BB((*ingles)->dir);
                     aux = *ingles;
                     (*ingles)->info = end_menor_filho->info;
-                    removeu = remover_arv_BB(&(*ingles)->dir, no);
+                    removeu = remover_arv_B3_arv_BB(&(*ingles)->dir, no);
                 } 
         }
         else if(strcmp(no->info.ingles, (*ingles)->info.ingles) < 0)
-                    removeu = remover_arv_BB(&((*ingles)->esq), no);        
+                    removeu = remover_arv_B3_arv_BB(&((*ingles)->esq), no);        
             else 
-                removeu = remover_arv_BB(&((*ingles)->dir), no);
+                removeu = remover_arv_B3_arv_BB(&((*ingles)->dir), no);
                 
     }
     else removeu = 0;
     
     return removeu;
 }
-int remover_arv_B3(arv_ptbr **pai, arv_ptbr **portugues, char info, int *flag)
+int remover_arv_B3(arv_ptbr **pai, arv_ptbr **portugues, char *palavra, int *flag)
 { 
 
 	int balanceamento = 0;
 
 	if(*portugues != NULL)
     {
-		if ((strcmp((*portugues)->info1.ptbr, info) == 0) || ((*portugues)->nInfos == 2 && (strcmp((*portugues)->info2.ptbr, info) == 0)))
+		if ((strcmp((*portugues)->info1.ptbr, palavra) == 0) || ((*portugues)->nInfos == 2 && (strcmp((*portugues)->info2.ptbr, palavra) == 0)))
         {
 			*flag = 1;
 
 			if (eh_folha_B3(*portugues) == 1)
-				balanceamento = remove_folha(pai, portugues, info);
+				balanceamento = remove_folha(pai, portugues, palavra);
 			
-			else if((eh_folha_B3((*portugues)->esq) == 1 && eh_folha_B3((*portugues)->cen) == 1 && ehfolha((*portugues)->dir) == 1) || (ehfolha((*portugues)->esq) == 1 && ehfolha((*portugues)->cen) == 1 && (*portugues)->nInfos == 1))
-                balanceamento = remove_NoFilhos_folhas(portugues, info);
+			else if((eh_folha_B3((*portugues)->esq) == 1 && eh_folha_B3((*portugues)->cen) == 1 && eh_folha_B3((*portugues)->dir) == 1) || (eh_folha_B3((*portugues)->esq) == 1 && eh_folha_B3((*portugues)->cen) == 1 && (*portugues)->nInfos == 1))
+                balanceamento = remove_no_filho_folhas(portugues, palavra);
 			
 			else
             {
@@ -804,45 +850,45 @@ int remover_arv_B3(arv_ptbr **pai, arv_ptbr **portugues, char info, int *flag)
                 pai_aux = NULL;
 				info_ptbr promove;
 				
-				if ((strcmp((*portugues)->info1.ptbr, info) == 0))
+				if ((strcmp((*portugues)->info1.ptbr, palavra) == 0))
                 {
-					balanceamento = remove_MenorNo(&pai_aux, &(*portugues)->cen, &promove);
+					balanceamento = remove_menor_no(&pai_aux, &(*portugues)->cen, &promove);
 					(*portugues)->info1 = promove;
 
 					if (balanceamento == 1) //arvore foi desbalanceada para o centro
-					    balanceamento = balanceiaArvore(portugues,0);
+					    balanceamento = balanceia_arv_B3(portugues,0);
 				}
                 
                 else
                 {
-					balanceamento = remove_MenorNo(&pai_aux, &(*portugues)->dir, &promove);
+					balanceamento = remove_menor_no(&pai_aux, &(*portugues)->dir, &promove);
 					(*portugues)->info2 = promove;
 
 					if (balanceamento == 1)//arvore foi desbalanceada para a direita
-						balanceamento = balanceiaArvore(portugues,1);
+						balanceamento = balanceia_arv_B3(portugues,1);
 				}
 			}		
 		}
         
-        else if((strcmp((*portugues)->info1.ptbr, info) < 0))
-	        balanceamento = remover(portugues, &(*portugues)->esq, info, flag);
+        else if((strcmp((*portugues)->info1.ptbr, palavra) < 0))
+	        balanceamento = remover_arv_B3(portugues, &(*portugues)->esq, palavra, flag);
 	        
-		else if((*portugues)->nInfos == 2 && (strcmp((*portugues)->info1.ptbr, info) > 0))
-	        balanceamento = remover(portugues, &(*portugues)->dir, info, flag);
+		else if((*portugues)->nInfos == 2 && (strcmp((*portugues)->info1.ptbr, palavra) > 0))
+	        balanceamento = remover_arv_B3(portugues, &(*portugues)->dir, palavra, flag);
 	    
 	    else
-	        balanceamento = remover(portugues, &(*portugues)->cen, info, flag);
+	        balanceamento = remover_arv_B3(portugues, &(*portugues)->cen, palavra, flag);
 
 	    if (balanceamento == 1 && *portugues != NULL && *pai != NULL)
         {
 	    	if (*portugues == (**pai).esq)
-				balanceamento = balanceiaArvore(pai,-1);
+				balanceamento = balanceia_arv_B3(pai,-1);
 
 	    	else if (*portugues == (**pai).cen)
-				balanceamento = balanceiaArvore(pai,0);
+				balanceamento = balanceia_arv_B3(pai,0);
 
 			else if (*portugues == (**pai).dir)
-				balanceamento = balanceiaArvore(pai,1);
+				balanceamento = balanceia_arv_B3(pai,1);
 	    }
 	}
 
@@ -851,10 +897,10 @@ int remover_arv_B3(arv_ptbr **pai, arv_ptbr **portugues, char info, int *flag)
 
 //----------------------------------------------------------------------------------------------------
 
+//----Liberar memória da árvore completa
 
-//----Liberar memória
-
-void liberar_lista_unidades(unidade *l_unidade) {
+void liberar_lista_unidades(unidade *l_unidade) 
+{
     unidade *atual = l_unidade;
     while (atual != NULL) {
         unidade *prox = atual->prox;
@@ -862,9 +908,8 @@ void liberar_lista_unidades(unidade *l_unidade) {
         atual = prox;
     }
 }
-
-// Função para liberar a árvore de inglês
-void liberar_arv_BB(arv_ingles *no) {
+void liberar_arv_BB(arv_ingles *no) 
+{
     if (no != NULL) {
         // Libera as subárvores recursivamente
             liberar_arv_BB(no->esq);
@@ -877,7 +922,8 @@ void liberar_arv_BB(arv_ingles *no) {
         free(no);
     }
 }
-void liberar_arv_B3(arv_ptbr *no) {
+void liberar_arv_B3(arv_ptbr *no) 
+{
     if (no != NULL) {
         // Libera as subárvores recursivamente
             liberar_arv_B3(no->esq);

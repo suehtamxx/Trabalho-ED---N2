@@ -42,7 +42,6 @@ void imprimir_arvore_rubro_negra(arv_ptbr *raiz, int nivel) {
 
 int main() {
     arv_ptbr *dicionario_portugues = NULL;
-    arv_ingles *arvore_binaria = NULL;
 
     // Lê o arquivo e constrói as árvores
     ler_arquivo(&dicionario_portugues);
@@ -61,19 +60,18 @@ int main() {
     //if(verificacao == 1)printf("elemento removido");
     //else printf("elemento nao foi removido");
 
-    printf("Informe a palavra em ingles: \n");
+    printf("Informe a palavra em portugues: \n");
     scanf("%[^\n]", palavra);
     printf("informe a unidade: \n");
     scanf("%d", &unidade);
 
-    funcaoauxIII(&dicionario_portugues, &dicionario_portugues, palavra, unidade);
+    funcaoIV(&dicionario_portugues, &dicionario_portugues, palavra, unidade);
 
     imprimir_arvore_rubro_negra(dicionario_portugues, 0);
 
 
     // Liberação de memória seria realizada aqui, caso necessário
     liberar_arvRN(dicionario_portugues);
-    liberar_arv_BB(arvore_binaria);
 
     return 0;
 }

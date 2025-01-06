@@ -64,7 +64,7 @@ void funcaoI(arv_ingles *no, int uni, char *palavra);
 void funcaoII(arv_ingles *no, char *palavra);
 void funcaoauxII(arv_ptbr *no, char *palavra);
 void funcaoIII(arv_ptbr **no, char *palavra, int uni);
-int funcaoauxIII(arv_ingles *no, char *palavra);
+void funcaoauxIII(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni);
 void liberar_arv_BB(arv_ingles *no);
 void liberar_arvRN(arv_ptbr *no);
 void liberar_lista_unidades(unidade *l_unidade);

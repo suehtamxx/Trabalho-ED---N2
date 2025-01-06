@@ -458,7 +458,7 @@ void funcaoI(arv_ingles *no, int uni, char *palavra)
             if(aux->unidade == uni)
             {
                 printf("Portugues: %s\n", palavra);
-                printf("   Ingles: %s\n", no->info.ingles);
+                printf("\tIngles: %s\n", no->info.ingles);
             }
             aux = aux->prox;
         }

@@ -53,6 +53,18 @@ arv_ptbr *procuraMenor(arv_ptbr *no);
 
 arv_ptbr *remove_no(arv_ptbr *no, char *valor);
 int remove_arvRN(arv_ptbr **no, char *valor);
+
+int remover_arv_BB(arv_ingles **ingles, arv_ingles *no);
+int eh_folha_BB(arv_ingles *ingles);
+arv_ingles *menor_filho_BB(arv_ingles *ingles);
+arv_ingles *so_um_filho_BB(arv_ingles *ingles);
+
+void funcaoauxI(arv_ptbr *no, int uni);
+void funcaoI(arv_ingles *no, int uni, char *palavra);
+void funcaoII(arv_ingles *no, char *palavra);
+void funcaoauxII(arv_ptbr *no, char *palavra);
+void funcaoIII(arv_ptbr **no, char *palavra, int uni);
+int funcaoauxIII(arv_ingles *no, char *palavra);
 void liberar_arv_BB(arv_ingles *no);
 void liberar_arvRN(arv_ptbr *no);
 void liberar_lista_unidades(unidade *l_unidade);

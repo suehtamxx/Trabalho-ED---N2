@@ -110,13 +110,14 @@ int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
 
     else if (strcmp(no->info.ingles, (*ingles)->info.ingles) == 0)
     {
-        unidade *atual;
-        atual = (*ingles)->info.l_unidade;
+        unidade *nova_unidade = no->info.l_unidade;
 
-        while (atual != NULL) 
-            atual = atual->prox;
-
-        atual = no->info.l_unidade;
+        // Adiciona a nova unidade no início da lista
+        nova_unidade->prox = (*ingles)->info.l_unidade;
+        (*ingles)->info.l_unidade = nova_unidade;
+        no->info.l_unidade = NULL;
+        free(no);
+        
     }
 
     else if(strcmp(no->info.ingles, (*ingles)->info.ingles) > 0)
@@ -270,6 +271,76 @@ int remove_arvRN(arv_ptbr **no, char *valor)
     return verificacao;
 }
 
+int eh_folha_BB(arv_ingles *ingles)
+{
+    int verifica = 0; //Cria e inicializa o verifica com 0, ou seja, pressupõe que é nulo
+    if(ingles->esq == NULL && ingles->dir == NULL) //Se a esquerda e a direita forem nula
+        verifica = 1; //Atribui nulo a variável, ou seja, não é nulo
+    
+    return verifica; //Retorna a verificação
+}
+arv_ingles *menor_filho_BB(arv_ingles *ingles)
+{
+    while(ingles != NULL && ingles->esq != NULL)
+        ingles = ingles->esq;
+
+    return ingles;
+}
+arv_ingles *so_um_filho_BB(arv_ingles *ingles)
+{
+    arv_ingles *aux; //Cria um nó aux
+    
+    if(ingles->esq != NULL && ingles->dir == NULL) //Se a esquerda for diferente de nulo e a direita for nulo
+        aux = ingles->esq; //O nó aux recebe o filho da esquerda
+    
+    else if(ingles->esq == NULL && ingles->dir != NULL) //Se a esquerda for nula e a direita for diferente de nulo
+        aux = ingles->dir; //O nó aux recebe o filho da direita
+
+    return aux; //Retorna o filho
+}
+int remover_arv_BB(arv_ingles **ingles, arv_ingles *no)
+{
+    int removeu = 1, verificacao;
+    arv_ingles *aux;
+    arv_ingles *end_filho, *end_menor_filho;
+
+    if((*ingles) != NULL)
+    {
+        if(strcmp((*ingles)->info.ingles, no->info.ingles) == 0)
+        {
+            verificacao = eh_folha_BB(*ingles);
+            
+            if(verificacao == 1)
+            {
+                aux = *ingles;
+                *ingles = NULL;
+                free(aux);
+            }
+            else if ((end_filho = so_um_filho_BB(*ingles)) != NULL)
+            {
+                aux = *ingles;
+                *ingles = end_filho;
+                free(aux);
+            }
+                else
+                {
+                    end_menor_filho = menor_filho_BB((*ingles)->dir);
+                    aux = *ingles;
+                    (*ingles)->info = end_menor_filho->info;
+                    removeu = remover_arv_BB(&(*ingles)->dir, no);
+                } 
+        }
+        else if(strcmp(no->info.ingles, (*ingles)->info.ingles) < 0)
+                    removeu = remover_arv_BB(&((*ingles)->esq), no);        
+            else 
+                removeu = remover_arv_BB(&((*ingles)->dir), no);
+                
+    }
+    else removeu = 0;
+    
+    return removeu;
+}
+
 void ler_arquivo(arv_ptbr **portugues)
 {
     FILE *dicionario = fopen("dicionario.txt", "r"); // Abre o arquivo para leitura
@@ -367,6 +438,122 @@ void ler_arquivo(arv_ptbr **portugues)
     fclose(dicionario); // Fecha o arquivo
 }
 
+void funcaoauxI(arv_ptbr *no, int uni)
+{
+    if(no != NULL)
+    {
+        funcaoI(no->info.ingles, uni, no->info.ptbr);
+        funcaoauxI(no->esq, uni);
+        funcaoauxI(no->dir, uni);
+    }
+}
+void funcaoI(arv_ingles *no, int uni, char *palavra)
+{
+    if(no != NULL)
+    {
+        unidade *aux;
+        aux = no->info.l_unidade;
+        while(aux != NULL)
+        {
+            if(aux->unidade == uni)
+            {
+                printf("Portugues: %s\n", palavra);
+                printf("   Ingles: %s\n", no->info.ingles);
+            }
+            aux = aux->prox;
+        }
+        funcaoI(no->esq, uni, palavra);
+        funcaoI(no->dir, uni, palavra);
+    }   
+}
+
+void funcaoauxII(arv_ptbr *no, char *palavra)
+{
+    if(no != NULL)
+    {
+        if(strcmp(no->info.ptbr, palavra) == 0)
+            funcaoII(no->info.ingles, palavra);
+        funcaoauxII(no->esq, palavra);
+        funcaoauxII(no->dir, palavra);
+    }
+}
+void funcaoII(arv_ingles *no, char *palavra)
+{
+    if(no != NULL)
+    {
+        printf("Ingles: %s\n", no->info.ingles);
+        funcaoII(no->esq, palavra);
+        funcaoII(no->dir, palavra);
+    }
+}
+
+int funcaoauxIII(arv_ingles *no, char *palavra)
+{
+    int removeu = 0;
+    if(no != NULL)
+    {
+        if(strcmp(no->info.ingles, palavra) == 0)
+            removeu = 1;
+        removeu = funcaoauxIII(no->esq, palavra);
+        removeu = funcaoauxIII(no->dir, palavra);
+    }
+    return removeu;
+}
+void funcaoIII(arv_ptbr **no, char *palavra, int uni)
+{
+    int removeuBB = 0;
+    int removeuVP = 0;
+    arv_ingles *atual;
+    unidade *aux, *anterior, *temp;
+    aux = NULL, anterior = NULL, temp = NULL;
+
+    if(*no != NULL)
+    {
+            atual = (*no)->info.ingles;
+                printf("Palavra: %s e No: %s", palavra, atual->info.ingles);
+                if(atual != NULL && strcmp(atual->info.ingles, palavra) == 0) 
+                {
+                    aux = atual->info.l_unidade;
+                    while(aux != NULL)
+                    {
+                        if(uni == aux->unidade)
+                        {
+                            if(anterior == NULL)
+                                atual->info.l_unidade = aux->prox;
+                            else anterior->prox = aux->prox;
+
+                            temp = aux;
+                            aux = aux->prox;
+                            free(temp);
+
+                            if(atual->info.l_unidade == NULL)
+                            {
+
+                                removeuBB = remover_arv_BB(&(*no)->info.ingles, atual);
+                                if(removeuBB == 1) printf("elemento removido\n");
+                                else printf("elemento nao removido\n");
+
+                                if((*no)->info.ingles == NULL)
+                                {
+                                    removeuVP = remove_arvRN(no, (*no)->info.ptbr);
+                                    if(removeuVP == 1) printf("removido da rubro negra\n");
+                                    else printf("nao foi removido da rubro negra\n");
+                                }
+                            }
+                        }
+                        anterior = aux;
+    
+                    }
+                }
+                if(atual != NULL && palavra != NULL)
+                {
+                    if(strcmp(palavra, atual->info.ingles) < 0)
+                            funcaoIII(&(*no)->esq, palavra, uni);
+                    else
+                        funcaoIII(&(*no)->dir, palavra, uni);
+                }
+    }
+}
 void liberar_lista_unidades(unidade *l_unidade) {
     unidade *atual = l_unidade;
     while (atual != NULL) {
@@ -375,7 +562,6 @@ void liberar_lista_unidades(unidade *l_unidade) {
         atual = prox;
     }
 }
-
 void liberar_arv_BB(arv_ingles *no) 
 {
     if (no != NULL) {

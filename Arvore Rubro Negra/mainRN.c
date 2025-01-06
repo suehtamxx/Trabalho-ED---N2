@@ -29,11 +29,12 @@ void imprimir_arvore_rubro_negra(arv_ptbr *raiz, int nivel) {
     if (raiz == NULL)
         return;
 
-
     // Indentação de acordo com o nível da árvore
     for (int i = 0; i < nivel; i++)
         printf("    ");
     printf("[%s] (%s)\n", raiz->info.ptbr, raiz->cor == 1 ? "PRETO" : "VERMELHO");
+
+    imprimir_arvore_BST_ingles(raiz->info.ingles);
 
     imprimir_arvore_rubro_negra(raiz->esq, nivel + 1);
     imprimir_arvore_rubro_negra(raiz->dir, nivel + 1);
@@ -46,30 +47,31 @@ int main() {
     // Lê o arquivo e constrói as árvores
     ler_arquivo(&dicionario_portugues);
 
-    char *valor[15];
-    *valor = (char *)malloc(sizeof(char));
-    int verificacao = 0;
+    char *palavra;
+    palavra = (char *)malloc(sizeof(char));
+    int unidade = 0;
+    //int verificacao = 0;
 
      // Imprime a árvore Rubro-Negra (português) e Binária (inglês)
-    printf("Árvore Rubro-Negra de Português:\n");
+    //printf("Árvore Rubro-Negra de Português:\n");
+    //imprimir_arvore_rubro_negra(dicionario_portugues, 0);
+
+    //printf("informe um elemento para ser removido: ");
+    //scanf(" %s", *valor);
+
+    //verificacao = remove_arvRN(&dicionario_portugues, *valor);
+    //if(verificacao == 1)printf("elemento removido");
+    //else printf("elemento nao foi removido");
+
+    printf("Informe a palavra em ingles: \n");
+    scanf("%[^\n]", palavra);
+    printf("informe a unidade: \n");
+    scanf("%d", &unidade);
+
+    funcaoIII(&dicionario_portugues, palavra, unidade);
+
     imprimir_arvore_rubro_negra(dicionario_portugues, 0);
 
-    printf("\nÁrvore Binária de Inglês:\n");
-    imprimir_arvore_BST_ingles(arvore_binaria);
-
-    printf("informe um elemento para ser removido: ");
-    scanf(" %s", *valor);
-
-    verificacao = remove_arvRN(&dicionario_portugues, *valor);
-    if(verificacao == 1)printf("elemento removido");
-    else printf("elemento nao foi removido");
-
-    // Imprime a árvore Rubro-Negra (português) e Binária (inglês)
-    printf("Árvore Rubro-Negra de Português:\n");
-    imprimir_arvore_rubro_negra(dicionario_portugues, 0);
-
-    printf("\nÁrvore Binária de Inglês:\n");
-    imprimir_arvore_BST_ingles(arvore_binaria);
 
     // Liberação de memória seria realizada aqui, caso necessário
     liberar_arvRN(dicionario_portugues);

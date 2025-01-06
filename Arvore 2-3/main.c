@@ -36,7 +36,7 @@ void imprimir_arvore_B3(arv_ptbr *portugues)
         {
             printf("Portugues: %s\n", portugues->info2.ptbr);
             imprimir_arvore_ingles(portugues->info2.ingles);
-            imprimir_arvore_B3(portugues->dir); //DESCOBRI O ERRO DA IMPRESSÂO AQUI            //
+            imprimir_arvore_B3(portugues->dir); //DESCOBRI O ERRO DA IMPRESSÂO AQUI
         }
         
         imprimir_arvore_B3(portugues->cen);

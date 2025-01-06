@@ -503,6 +503,7 @@ void funcaoII(arv_ingles *no, char *palavra)
 void funcaoauxIII(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni)
 {
     int verificacao = 0;
+
     if(*no != NULL)
     {
         funcaoIII(&(*no)->info.ingles, palavra, uni);
@@ -513,6 +514,7 @@ void funcaoauxIII(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni)
             if(verificacao == 1)printf("removido\n");
             else printf("nao removido\n");
         }
+        
         if(*no != NULL)
             funcaoauxIII(&(*no)->esq, portugues, palavra, uni);
         if(*no != NULL)
@@ -532,7 +534,6 @@ void funcaoIII(arv_ingles **no, char *palavra, int uni)
         atual = *no;
         aux = atual->info.l_unidade;
 
-        printf("Palavra: %s e Ingles: %s\n", palavra, atual->info.ingles);
         if(strcmp(palavra, atual->info.ingles) == 0)
         {
             while(aux != NULL)
@@ -566,6 +567,39 @@ void funcaoIII(arv_ingles **no, char *palavra, int uni)
             funcaoIII(&(*no)->dir, palavra, uni);
     }
 }
+
+void funcaoIV(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni)
+{
+    int verificacao = 0;
+    arv_ingles *atual;
+
+    if(*no != NULL)
+    {
+        if(strcmp(palavra, (*no)->info.ptbr) == 0)
+        {
+            char palavra_ingles[100];
+            atual = (*no)->info.ingles;
+
+            strcpy(palavra_ingles, atual->info.ingles);
+
+            funcaoIII(&(*no)->info.ingles, palavra_ingles, uni);
+
+            if((*no)->info.ingles == NULL)
+            {
+                verificacao = remove_arvRN(portugues, palavra);
+                if(verificacao == 1)printf("removido da rubro negra\n");
+                else printf("nao foi removido da rubro negra\n");
+            }
+
+            }
+            if(*no != NULL)
+                funcaoIV(&(*no)->esq, portugues, palavra, uni);
+            if(*no != NULL)
+                funcaoIV(&(*no)->dir, portugues, palavra, uni);
+        }
+}
+
+
 void liberar_lista_unidades(unidade *l_unidade) {
     unidade *atual = l_unidade;
     while (atual != NULL) {

@@ -89,8 +89,23 @@ void imprimir_unid_B3(arv_ptbr *portugues, int unidade);
 //----------------------------------------------------------------------------------------------------
 
 //----Imprimir de acordo com a palavra em português
+
 void imprimir_ptbr_BB(arv_ingles *ingles);
 void imprimir_ptbr_B3(arv_ptbr *portugues, char *palavra);
+
+//----------------------------------------------------------------------------------------------------
+
+//----Remover de acordo com a palavra em inglês e a unidade
+
+void remover_ingles_BB(arv_ingles **no, char *palavra, int unid);
+void remover_ingles_B3(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int unid);
+
+//----------------------------------------------------------------------------------------------------
+
+//----Remover de acordo com a palavra em português e a unidade
+
+void remover_portugues_BB(arv_ingles **no, int unid);
+void remover_portugues_B3(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int unid);
 
 //----------------------------------------------------------------------------------------------------
 

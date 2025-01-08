@@ -4,74 +4,108 @@
 #include "rubronegra.h"
 #include "rubronegra.c"
 
-// Prototipos das funções necessárias
-void imprimir_arvore_BST_ingles(arv_ingles *ingles) {
-    if (ingles == NULL)
-        return;
+void imprimir_arvore_BB(arv_ingles *ingles) 
+{
+    if (ingles != NULL) 
+    {
+        printf("\tInglês: %s\n", ingles->info.ingles);
 
-    // Imprime informações do nó atual
-    printf("\tInglês: %s\n", ingles->info.ingles);
+        unidade *unid = ingles->info.l_unidade;
+        while (unid != NULL) 
+        {
+            printf("\t\tUnidade: %d\n", unid->unidade);
+            unid = unid->prox;
+        }
 
-    // Imprime as unidades associadas
-    unidade *unid = ingles->info.l_unidade;
-    while (unid != NULL) {
-        printf("\t\tUnidade: %d\n", unid->unidade);
-        unid = unid->prox;
+        imprimir_arvore_BB(ingles->esq);
+        imprimir_arvore_BB(ingles->dir);
     }
-
-    // Subárvore esquerda
-    imprimir_arvore_BST_ingles(ingles->esq);
-
-    // Subárvore direita
-    imprimir_arvore_BST_ingles(ingles->dir);
-}
-void imprimir_arvore_rubro_negra(arv_ptbr *raiz, int nivel) {
-    if (raiz == NULL)
-        return;
-
-    // Indentação de acordo com o nível da árvore
-    for (int i = 0; i < nivel; i++)
-        printf("    ");
-    printf("[%s] (%s)\n", raiz->info.ptbr, raiz->cor == 1 ? "PRETO" : "VERMELHO");
-
-    imprimir_arvore_BST_ingles(raiz->info.ingles);
-
-    imprimir_arvore_rubro_negra(raiz->esq, nivel + 1);
-    imprimir_arvore_rubro_negra(raiz->dir, nivel + 1);
 }
 
-int main() {
-    arv_ptbr *dicionario_portugues = NULL;
+void imprimir_arvore_RN(arv_ptbr *raiz) 
+{
+    if (raiz != NULL) 
+    {
+        printf("\t[%s] (%s)\n", raiz->info.ptbr, raiz->cor == 1 ? "PRETO" : "VERMELHO");
 
-    // Lê o arquivo e constrói as árvores
+        imprimir_arvore_BB(raiz->info.ingles);
+        imprimir_arvore_RN(raiz->esq);
+        imprimir_arvore_RN(raiz->dir);
+    }
+}
+
+int main()
+{
+    int op = 0, unid = 0;
+    char palavra[100];
+    arv_ptbr *dicionario_portugues;
+    dicionario_portugues = NULL;
+    
     ler_arquivo(&dicionario_portugues);
+    
+    do
+    {
+        printf("\n==================== MENU ====================\n");
+        printf("1. Imprimir todas as palavras de acordo com a unidade\n");
+        printf("2. Imprimir todas as palavras em ingles de acordo com a palavra em portugues.\n");
+        printf("3. Remover uma palavra em ingles de acordo com a unidade.\n");
+        printf("4. Remover uma palavra em portugues de acordo com a unidade.\n");
+        printf("5. Sair.\n");
 
-    char *palavra;
-    palavra = (char *)malloc(sizeof(char));
-    int unidade = 0;
-     // Imprime a árvore Rubro-Negra (português) e Binária (inglês)
-    //printf("Árvore Rubro-Negra de Português:\n");
-    //imprimir_arvore_rubro_negra(dicionario_portugues, 0);
+        printf("\nInforme uma opcao: ");
+        scanf(" %d", &op);
 
-    //printf("informe um elemento para ser removido: ");
-    //scanf(" %s", valor);
+        switch (op)
+        {
+        case 1:
+            printf("\nInforme uma unidade: ");
+            scanf(" %d", &unid);
 
-    //verificacao = remove_arvRN(&dicionario_portugues, valor);
-    //if(verificacao == 1)printf("elemento removido");
-    //else printf("elemento nao foi removido");
+            printf("\n----Resultado:\n");
+            imprimir_unidade_RN(dicionario_portugues, unid);
 
-    printf("Informe a palavra em portugues: \n");
-    scanf("%[^\n]", palavra);
-    printf("informe a unidade: \n");
-    scanf("%d", &unidade);
+            break;
 
-    funcaoauxIV(&dicionario_portugues, &dicionario_portugues, palavra, unidade);
+        case 2:
+            printf("\nInforme uma palavra em portugues: ");
+            scanf(" %[^\n]", palavra);
 
-    imprimir_arvore_rubro_negra(dicionario_portugues, 0);
+            printf("\n----Resultado:\n");
+            imprimir_ptbr_RN(dicionario_portugues, palavra);
 
+            break;
 
-    // Liberação de memória seria realizada aqui, caso necessário
-    liberar_arvRN(dicionario_portugues);
+        case 3:
+            printf("\nInforme uma palavra em ingles que deseja remover: ");
+            scanf(" %[^\n]", palavra);
+
+            printf("\nInforme de qual unidade: ");
+            scanf(" %d", &unid);
+
+            remover_ingles_RN(NULL, &dicionario_portugues, palavra, unid);
+            imprimir_arvore_RN(dicionario_portugues);
+
+            break;
+        case 4:
+            printf("\nInforme uma palavra em portugues que deseja remover: ");
+            scanf(" %[^\n]", palavra);
+
+            printf("\nInforme de qual unidade: ");
+            scanf(" %d", &unid);
+
+            remover_portugues_RN(NULL, &dicionario_portugues, palavra, unid);
+            imprimir_arvore_RN(dicionario_portugues);
+
+            break;
+
+        default:
+            printf("\nSaindo...");
+            break;
+        }
+
+    } while (op != 5);
+    
+    liberar_arv_RN(dicionario_portugues);
 
     return 0;
 }

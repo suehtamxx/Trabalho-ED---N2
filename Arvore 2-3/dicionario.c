@@ -870,10 +870,10 @@ int remover_arv_B3(arv_ptbr **pai, arv_ptbr **portugues, char *palavra, int *fla
 			}		
 		}
         
-        else if((strcmp((*portugues)->info1.ptbr, palavra) < 0))
+        else if((strcmp(palavra, (*portugues)->info1.ptbr) < 0))
 	        balanceamento = remover_arv_B3(portugues, &(*portugues)->esq, palavra, flag);
 	        
-		else if((*portugues)->nInfos == 2 && (strcmp((*portugues)->info1.ptbr, palavra) > 0))
+		else if((*portugues)->nInfos == 2 && (strcmp(palavra, (*portugues)->info1.ptbr) > 0))
 	        balanceamento = remover_arv_B3(portugues, &(*portugues)->dir, palavra, flag);
 	    
 	    else

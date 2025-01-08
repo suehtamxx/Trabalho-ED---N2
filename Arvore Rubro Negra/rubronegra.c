@@ -499,7 +499,6 @@ void remover_ingles_RN(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int u
         {
             verificacao = remove_arv_RN(portugues, (*no)->info.ptbr);
             if(verificacao == 1)printf("removido\n");
-            else printf("nao removido\n");
         }
         
         if(*no != NULL)
@@ -515,11 +514,11 @@ void remover_ingles_BB(arv_ingles **no, char *palavra, int uni)
         int removeuBB = 0;
         arv_ingles *atual;
         unidade *aux;
-        unidade *anterior = NULL;
-        aux = NULL;
+        unidade *anterior;
 
         atual = *no;
         aux = atual->info.l_unidade;
+        anterior = NULL;
 
         if(strcmp(palavra, atual->info.ingles) == 0)
         {
@@ -539,11 +538,11 @@ void remover_ingles_BB(arv_ingles **no, char *palavra, int uni)
                     if (atual->info.l_unidade == NULL) 
                     {
                         removeuBB = remover_arv_BB(&(*no), atual);
-                            if (removeuBB == 1)
-                                printf("Palavra removida da árvore binária: %s\n", atual->info.ingles);
-                            else
-                                printf("Falha ao remover a palavra da árvore binária: %s\n", atual->info.ingles);
-                    }else 
+                        if (removeuBB == 1) printf("Palavra removida da Arvore Binaria");
+                        else printf("Nao foi possivel remover da Arvore Binaria");
+                    }
+                    
+                    else 
                     {
                         anterior = aux;
                         aux = aux->prox;
@@ -551,10 +550,11 @@ void remover_ingles_BB(arv_ingles **no, char *palavra, int uni)
                 }
             }
         }
-            if(*no != NULL)
-                remover_ingles_BB(&(*no)->esq, palavra, uni);
-            if(*no != NULL)
-                remover_ingles_BB(&(*no)->dir, palavra, uni);
+        
+        if(*no != NULL)
+            remover_ingles_BB(&(*no)->esq, palavra, uni);
+        if(*no != NULL)
+            remover_ingles_BB(&(*no)->dir, palavra, uni);
     }
 }
 
@@ -595,42 +595,41 @@ void remover_portugues_BB(arv_ingles **no, int uni)
         atual = (*no);
         aux = atual->info.l_unidade;
         
-            while(aux != NULL)
+        while(aux != NULL)
+        {
+            if(uni == aux->unidade)
             {
-                if(uni == aux->unidade)
-                {
-                    if (anterior == NULL)
-                        atual->info.l_unidade = aux->prox; 
-                    else 
-                        anterior->prox = aux->prox; 
+                if (anterior == NULL) atual->info.l_unidade = aux->prox; 
+                else anterior->prox = aux->prox; 
 
-                    free(aux); 
-                    aux = (anterior == NULL) ? atual->info.l_unidade : anterior->prox;
-
-                }
-
-                    if (atual->info.l_unidade == NULL) 
-                    {
-                        removeuBB = remover_arv_BB(&(*no), atual);
-                            if (removeuBB == 1)
-                                printf("Palavra removida da árvore binária: %s\n", atual->info.ingles);
-                            else
-                                printf("Falha ao remover a palavra da árvore binária: %s\n", atual->info.ingles);
-                    }else 
-                    {
-                        anterior = aux;
-                        aux = aux->prox;
-                    }
+                free(aux); 
+                aux = (anterior == NULL) ? atual->info.l_unidade : anterior->prox;
             }
-                if(*no != NULL)
-                    remover_portugues_BB(&(*no)->esq, uni);
-                if(*no != NULL)
-                    remover_portugues_BB(&(*no)->dir, uni);
+
+            if (atual->info.l_unidade == NULL) 
+            {
+                removeuBB = remover_arv_BB(&(*no), atual);
+                if (removeuBB == 1) printf("Palavra removida da Arvore Binaria");
+                else printf("Nao foi possivel remover da Arvore Binaria");
+            }
+            
+            else 
+            {
+                anterior = aux;
+                aux = aux->prox;
+            }
+        }
+
+        if(*no != NULL)
+            remover_portugues_BB(&(*no)->esq, uni);
+        if(*no != NULL)
+            remover_portugues_BB(&(*no)->dir, uni);
     }
 }
 
 
-void liberar_lista_unidades(unidade *l_unidade) {
+void liberar_lista_unidades(unidade *l_unidade) 
+{
     unidade *atual = l_unidade;
     while (atual != NULL) {
         unidade *prox = atual->prox;
@@ -640,7 +639,8 @@ void liberar_lista_unidades(unidade *l_unidade) {
 }
 void liberar_arv_BB(arv_ingles *no) 
 {
-    if (no != NULL) {
+    if (no != NULL) 
+    {
         // Libera as subárvores recursivamente
             liberar_arv_BB(no->esq);
             liberar_arv_BB(no->dir);

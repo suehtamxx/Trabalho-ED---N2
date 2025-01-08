@@ -43,6 +43,7 @@ arv_ptbr *criar_no_arv_B3(info_ptbr info, arv_ptbr *filhoE, arv_ptbr *filhoC)
 
     return (no); //Retorna o nó alocado
 }
+
 //----------------------------------------------------------------------------------------------------
 
 //----Auxiliares da inserir na Árvore B3
@@ -98,6 +99,7 @@ arv_ptbr *adiciona_chave(arv_ptbr *no, info_ptbr info, arv_ptbr *filho)
     
     return (no); //Retorna o nó com as infos inseridas
 }
+
 //----------------------------------------------------------------------------------------------------
 
 //----Auxiliares da inserir na Árvore BB
@@ -121,6 +123,7 @@ arv_ingles *menor_filho_BB(arv_ingles *ingles)
 
     return ingles;
 }
+
 //----------------------------------------------------------------------------------------------------
 
 //----Verifica se é folha
@@ -266,28 +269,21 @@ void ler_arquivo(arv_ptbr **portugues)
     FILE *dicionario;
     dicionario = fopen("dicionario.txt", "r"); //Abre o arquivo para leitura
 
-        char *linha = NULL; // Ponteiro para a linha
-        size_t tam = 0; // Tamanho da linha
-        ssize_t num_c; // Número de caracteres lidos
-        int atual = 0;
+    char *linha = NULL; // Ponteiro para a linha
+    size_t tam = 0; // Tamanho da linha
+    ssize_t num_c; // Número de caracteres lidos
+    int atual = 0;
+    
     if (dicionario != NULL)
     {
-        printf("Arquivo aberto com sucesso.\n");
-        //fseek(dicionario, 0, SEEK_SET);
-
-
         // Lê cada linha do arquivo
         while ((num_c = getline(&linha, &tam, dicionario)) != -1)
         {
-            printf("\nLinha lida (%d caracteres): %s\n", num_c, linha);
-
             linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
 
             if (linha[0] == '%') // Identifica uma unidade
-            {
                 atual = atoi(&linha[9]);
-                printf("Unidade atual: %d\n", atual);
-            }
+            
 
             else if (strchr(linha, ':')) // Identifica uma linha com tradução
             {
@@ -295,47 +291,43 @@ void ler_arquivo(arv_ptbr **portugues)
                 char palavras_portugues[200];
 
                 // Extrai as partes em inglês e português
-                if (sscanf(linha, "%[^:]: %[^\n]", palavra_ingles, palavras_portugues) == 2) {
+                if (sscanf(linha, "%[^:]: %[^\n]", palavra_ingles, palavras_portugues) == 2) 
+                {
                     // Verifica e remove o ponto e vírgula ao final, se existir
                     size_t len = strlen(palavras_portugues);
-                    if (len > 0 && palavras_portugues[len - 1] == ';') {
+                    if (len > 0 && palavras_portugues[len - 1] == ';') 
+                    {
                         palavras_portugues[len - 1] = '\0'; // Remove o ponto e vírgula
                     }
-
-                    printf("Lido: Ingles = %s, Portugues = %s\n", palavra_ingles, palavras_portugues);
-
-
-                        // Processa cada tradução
-                        char *palavra_port = strtok(palavras_portugues, ",");
-                        while (palavra_port)
+                    // Processa cada tradução
+                    char *palavra_port = strtok(palavras_portugues, ",");
+                    while (palavra_port)
+                    {
+                        arv_ingles *novo_no;
+                        novo_no = cria_no_arv_BB();
+                        if (novo_no != NULL)
                         {
-                            arv_ingles *novo_no;
-                            novo_no = cria_no_arv_BB();
-                            if (novo_no != NULL)
-                            {
-                                strcpy(novo_no->info.ingles, palavra_ingles);
-                                novo_no->info.l_unidade = criar_no_l_unid();
-                                novo_no->info.l_unidade->unidade = atual;
+                            strcpy(novo_no->info.ingles, palavra_ingles);
+                            novo_no->info.l_unidade = criar_no_l_unid();
+                            novo_no->info.l_unidade->unidade = atual;
 
-                                while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
+                            while (*palavra_port == ' ') palavra_port++; // Remove espaços no início
 
-                                info_ptbr nova_info;
-                                strcpy(nova_info.ptbr, palavra_port); // Português
-                                nova_info.ingles = novo_no;
+                            info_ptbr nova_info;
+                            strcpy(nova_info.ptbr, palavra_port); // Português
+                            nova_info.ingles = novo_no;
 
-                                info_ptbr promove;
-                                arv_ptbr *pai;
-                                pai = NULL;
+                            info_ptbr promove;
+                            arv_ptbr *pai;
+                            pai = NULL;
 
-                                printf("Inserindo na arvore: %s -> %s\n", palavra_port, palavra_ingles);
-                                inserir_arv_B3(portugues, nova_info, &promove, &pai);
-                                
-                                palavra_port = strtok(NULL, ",");
+                            inserir_arv_B3(portugues, nova_info, &promove, &pai);
+                            
+                            palavra_port = strtok(NULL, ",");
 
-                            } 
-                            else printf("Erro de alocacao\n");
-                        //liberar_arv_BB(novo_no);
-                        }
+                        } 
+                        else printf("Erro de alocacao\n");
+                    }
                 } 
                 else printf("Erro ao processar linha: %s\n", linha);
             }
@@ -361,12 +353,11 @@ void imprimir_unid_BB(arv_ingles *ingles, int unid, char *palavra)
         {
             if (atual->unidade == unid)
             {
-                printf("Portugues: %s\n", palavra);
+                printf("\nPortugues: %s\n", palavra);
                 printf("\tIngles: %s\n", ingles->info.ingles);
             }
             
             atual = atual->prox; 
-            printf("\n");
         }
 
         imprimir_unid_BB(ingles->esq, unid, palavra);
@@ -381,10 +372,12 @@ void imprimir_unid_B3(arv_ptbr *portugues, int unid)
 
         imprimir_unid_BB(portugues->info1.ingles, unid, portugues->info1.ptbr); 
         if (portugues->nInfos == 2)
+        {
             imprimir_unid_BB(portugues->info2.ingles, unid, portugues->info2.ptbr);
+            imprimir_unid_B3(portugues->dir, unid);
+        }
                   
         imprimir_unid_B3(portugues->cen, unid);
-        imprimir_unid_B3(portugues->dir, unid);
     }
 }
 
@@ -413,10 +406,190 @@ void imprimir_ptbr_B3(arv_ptbr *portugues, char *palavra)
         
         
         if (portugues->nInfos == 2 && strcmp(portugues->info2.ptbr, palavra) == 0)
+        {
             imprimir_ptbr_BB(portugues->info2.ingles);
+            imprimir_ptbr_B3(portugues->dir, palavra);
+        }
                   
         imprimir_ptbr_B3(portugues->cen, palavra);
-        imprimir_ptbr_B3(portugues->dir, palavra);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+
+//----Remover de acordo com a palavra em inglês e a unidade
+
+void remover_ingles_BB(arv_ingles **no, char *palavra, int unid)
+{
+    if (*no != NULL)
+    {
+        int removeuBB = 0;
+        arv_ingles *atual;
+        unidade *aux;
+        unidade *anterior;
+
+        atual = *no;
+        aux = atual->info.l_unidade;
+        anterior = NULL;
+
+        if (strcmp(palavra, atual->info.ingles) == 0)
+        {
+            while(aux != NULL)
+            {
+                if(unid == aux->unidade)
+                {
+                    if (anterior == NULL) atual->info.l_unidade = aux->prox; 
+                    else anterior->prox = aux->prox; 
+
+                    free(aux); 
+                    aux = (anterior == NULL) ? atual->info.l_unidade : anterior->prox;
+
+                    if (atual->info.l_unidade == NULL) 
+                    {
+                        removeuBB = remover_arv_BB(&(*no), atual);
+                        if (removeuBB == 1) printf("Palavra removida da Arvore Binaria");
+                        else printf("Nao foi possivel remover da Arvore Binaria");
+                    }
+                    
+                    else 
+                    {
+                        anterior = aux;
+                        aux = aux->prox;
+                    }
+                }
+            }
+        }
+        
+        if(*no != NULL)
+            remover_ingles_BB(&(*no)->esq, palavra, unid);
+        if(*no != NULL)
+            remover_ingles_BB(&(*no)->dir, palavra, unid);
+    }
+}
+void remover_ingles_B3(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int unid)
+{
+    if(*no != NULL)
+    {
+        int verificacao = 0;
+        
+        if(*no != NULL)
+            remover_ingles_B3(&(*no)->esq, portugues, palavra, unid);
+
+        remover_ingles_BB(&(*no)->info1.ingles, palavra, unid);
+        if ((*no)->info1.ingles == NULL)
+        {
+            int flag = 0;
+            verificacao = remover_arv_B3(NULL, portugues, (*no)->info1.ptbr, &flag);
+            if (verificacao == 1) printf("No removido da Arvore B3\n");
+            else printf("Nao foi possivel remover da Arvore B3\n");
+        }
+        
+        if((*no)->nInfos == 2)
+        {
+            remover_ingles_BB(&(*no)->info2.ingles, palavra, unid);
+            if ((*no)->info2.ingles == NULL)
+            {
+                int flag = 0;
+                verificacao = remover_arv_B3(NULL, portugues, (*no)->info2.ptbr, &flag);
+                if (verificacao == 1) printf("No removido da Arvore B3\n");
+                else printf("Nao foi possivel remover da Arvore B3\n");
+            }
+
+            if(*no != NULL)
+                remover_ingles_B3(&(*no)->dir, portugues, palavra, unid);
+        }
+
+        if(*no != NULL)
+            remover_ingles_B3(&(*no)->esq, portugues, palavra, unid);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+
+//----Remover de acordo com a palavra em português e a unidade
+
+void remover_portugues_BB(arv_ingles **no, int unid)
+{
+    if(*no != NULL)
+    {
+        int removeuBB = 0;
+        arv_ingles *atual;
+        unidade *aux;
+        unidade *anterior;
+        
+        atual = (*no);
+        aux = atual->info.l_unidade;
+        anterior = NULL;
+        
+        while(aux != NULL)
+        {
+            if(unid == aux->unidade)
+            {
+                if (anterior == NULL) atual->info.l_unidade = aux->prox; 
+                else anterior->prox = aux->prox; 
+
+                free(aux); 
+                aux = (anterior == NULL) ? atual->info.l_unidade : anterior->prox;
+            }
+
+            if (atual->info.l_unidade == NULL) 
+            {
+                removeuBB = remover_arv_BB(&(*no), atual);
+                if (removeuBB == 1) printf("Palavra removida da Arvore Binaria");
+                else printf("Nao foi possivel remover da Arvore Binaria");
+            }
+            
+            else 
+            {
+                anterior = aux;
+                aux = aux->prox;
+            }
+        }
+
+        if(*no != NULL)
+            remover_portugues_BB(&(*no)->esq, unid);
+        if(*no != NULL)
+            remover_portugues_BB(&(*no)->dir, unid);
+    }
+}
+void remover_portugues_B3(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int unid)
+{
+    if(*no != NULL)
+    {
+        int verificacao = 0;
+
+        if(*no != NULL)
+            remover_portugues_B3(&(*no)->esq, portugues, palavra, unid);
+
+        if(strcmp((*no)->info1.ptbr, palavra) == 0)
+        {
+            remover_portugues_BB(&(*no)->info1.ingles, unid);
+            if ((*no)->info1.ingles == NULL)
+            {
+                int flag = 0;
+                verificacao = remover_arv_B3(NULL, portugues, (*no)->info1.ptbr, &flag);
+                if (verificacao == 1) printf("No removido da Arvore B3\n");
+                else printf("Nao foi possivel remover da Arvore B3\n");
+            }
+        }
+
+        if((*no)->nInfos == 2)
+        {
+            remover_portugues_BB(&(*no)->info2.ingles, unid);
+            if ((*no)->info2.ingles == NULL)
+            {
+                int flag = 0;
+                verificacao = remover_arv_B3(NULL, portugues, (*no)->info2.ptbr, &flag);
+                if (verificacao == 1) printf("No removido da Arvore B3\n");
+                else printf("Nao foi possivel remover da Arvore B3\n");
+            }
+
+            if(*no != NULL)
+                remover_portugues_B3(&(*no)->dir, portugues, palavra, unid);
+        }
+       
+        if(*no != NULL)
+            remover_portugues_B3(&(*no)->dir, portugues, palavra, unid);
     }
 }
 
@@ -426,7 +599,6 @@ void imprimir_ptbr_B3(arv_ptbr *portugues, char *palavra)
 
 void libera_no(arv_ptbr **No)
 {
-
 	arv_ptbr *aux;
 
 	aux = *No;
@@ -785,7 +957,7 @@ int remove_menor_no(arv_ptbr **pai_aux, arv_ptbr **No, info_ptbr *promove)
 
 //----Remover nó nas Árvores
 
-int remover_arv_B3_arv_BB(arv_ingles **ingles, arv_ingles *no)
+int remover_arv_BB(arv_ingles **ingles, arv_ingles *no)
 {
     int removeu = 1, verificacao;
     arv_ingles *aux;
@@ -814,13 +986,13 @@ int remover_arv_B3_arv_BB(arv_ingles **ingles, arv_ingles *no)
                     end_menor_filho = menor_filho_BB((*ingles)->dir);
                     aux = *ingles;
                     (*ingles)->info = end_menor_filho->info;
-                    removeu = remover_arv_B3_arv_BB(&(*ingles)->dir, no);
+                    removeu = remover_arv_BB(&(*ingles)->dir, no);
                 } 
         }
         else if(strcmp(no->info.ingles, (*ingles)->info.ingles) < 0)
-                    removeu = remover_arv_B3_arv_BB(&((*ingles)->esq), no);        
+                    removeu = remover_arv_BB(&((*ingles)->esq), no);        
             else 
-                removeu = remover_arv_B3_arv_BB(&((*ingles)->dir), no);
+                removeu = remover_arv_BB(&((*ingles)->dir), no);
                 
     }
     else removeu = 0;

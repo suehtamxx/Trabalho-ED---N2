@@ -47,9 +47,17 @@ int main()
 {
     arv_ptbr *dicionario_portugues;
     dicionario_portugues = NULL;
-    
+    char palavra[100];
+    int flag = 0;
     // Chama a função para ler o arquivo e construir a árvore
     ler_arquivo(&dicionario_portugues);
+    imprimir_arvore_B3(dicionario_portugues);
+
+    printf("Informe a palavra ingles: \n");
+    scanf("%[^\n]", palavra);
+    
+
+    remover_arv_B3(NULL, &dicionario_portugues, palavra, &flag);
 
     // Imprime a árvore para verificar se a leitura está correta
     imprimir_arvore_B3(dicionario_portugues);

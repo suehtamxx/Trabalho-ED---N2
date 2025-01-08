@@ -31,7 +31,7 @@ arv_ingles *cria_no_arv_BB()
     return no; //Retorna o nó alocado
 }
 
-arv_ptbr *criar_no_arvRN()
+arv_ptbr *criar_no_arv_RN()
 {
     arv_ptbr *no;
     no = (arv_ptbr*)malloc(sizeof(arv_ptbr));
@@ -131,7 +131,7 @@ int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
     return inseriu;
 }
 
-void inserir_arvRN(arv_ptbr **R, arv_ptbr *no)
+void inserir_arv_RN(arv_ptbr **R, arv_ptbr *no)
 {
     if(*R == NULL)
         *R = no;
@@ -143,9 +143,9 @@ void inserir_arvRN(arv_ptbr **R, arv_ptbr *no)
                 printf("nao foi possivel inserir na arvBB!");
         }
         if(strcmp(no->info.ptbr, (*R)->info.ptbr) < 0)
-            inserir_arvRN(&((*R)->esq), no);
+            inserir_arv_RN(&((*R)->esq), no);
         else if(strcmp(no->info.ptbr, (*R)->info.ptbr) > 0)
-            inserir_arvRN(&((*R)->dir), no);
+            inserir_arv_RN(&((*R)->dir), no);
 
     if(cor((*R)->esq) == 1 && cor((*R)->dir) == 2)
         rotacionaEsq(R);
@@ -257,7 +257,7 @@ arv_ptbr *remove_no(arv_ptbr *no, char *valor)
     return balancear(no);
 }
 
-int remove_arvRN(arv_ptbr **no, char *valor)
+int remove_arv_RN(arv_ptbr **no, char *valor)
 {
     int verificacao = 0;
     *no = remove_no(*no, valor);
@@ -404,12 +404,12 @@ void ler_arquivo(arv_ptbr **portugues)
                         nova_info.ingles = novo_no;
 
                         // Cria o nó para a árvore rubro-negra
-                        arv_ptbr *novo_no_rn = criar_no_arvRN();
-                        if (novo_no_rn != NULL)
+                        arv_ptbr *novo_no_RN = criar_no_arv_RN();
+                        if (novo_no_RN != NULL)
                         {
-                            novo_no_rn->info = nova_info; // Copia a informação
+                            novo_no_RN->info = nova_info; // Copia a informação
                             printf("Inserindo na árvore: %s -> %s\n", palavra_port, palavra_ingles);
-                            inserir_arvRN(portugues, novo_no_rn); // Insere o nó na árvore rubro-negra
+                            inserir_arv_RN(portugues, novo_no_RN); // Insere o nó na árvore rubro-negra
                             (*portugues)->cor = 1;
                         }
                         else
@@ -438,16 +438,16 @@ void ler_arquivo(arv_ptbr **portugues)
     fclose(dicionario); // Fecha o arquivo
 }
 
-void funcaoauxI(arv_ptbr *no, int uni)
+void imprimir_unidade_RN(arv_ptbr *no, int uni)
 {
     if(no != NULL)
     {
-        funcaoI(no->info.ingles, uni, no->info.ptbr);
-        funcaoauxI(no->esq, uni);
-        funcaoauxI(no->dir, uni);
+        imprimir_unidade_BB(no->info.ingles, uni, no->info.ptbr);
+        imprimir_unidade_RN(no->esq, uni);
+        imprimir_unidade_RN(no->dir, uni);
     }
 }
-void funcaoI(arv_ingles *no, int uni, char *palavra)
+void imprimir_unidade_BB(arv_ingles *no, int uni, char *palavra)
 {
     if(no != NULL)
     {
@@ -462,66 +462,53 @@ void funcaoI(arv_ingles *no, int uni, char *palavra)
             }
             aux = aux->prox;
         }
-        funcaoI(no->esq, uni, palavra);
-        funcaoI(no->dir, uni, palavra);
+        imprimir_unidade_BB(no->esq, uni, palavra);
+        imprimir_unidade_BB(no->dir, uni, palavra);
     }   
 }
 
-void funcaoauxII(arv_ptbr *no, char *palavra)
+void imprimir_ptbr_RN(arv_ptbr *no, char *palavra)
 {
     if(no != NULL)
     {
         if(strcmp(no->info.ptbr, palavra) == 0)
-            funcaoII(no->info.ingles, palavra);
-        funcaoauxII(no->esq, palavra);
-        funcaoauxII(no->dir, palavra);
+            imprimir_ptbr_BB(no->info.ingles, palavra);
+        imprimir_ptbr_RN(no->esq, palavra);
+        imprimir_ptbr_RN(no->dir, palavra);
     }
 }
-void funcaoII(arv_ingles *no, char *palavra)
+void imprimir_ptbr_BB(arv_ingles *no, char *palavra)
 {
     if(no != NULL)
     {
         printf("Ingles: %s\n", no->info.ingles);
-        funcaoII(no->esq, palavra);
-        funcaoII(no->dir, palavra);
+        imprimir_ptbr_BB(no->esq, palavra);
+        imprimir_ptbr_BB(no->dir, palavra);
     }
 }
 
-//int funcaoauxIII(arv_ingles *no, char *palavra)
-//{
-//    int removeu = 0;
-//    if(no != NULL)
-//    {
-//        if(strcmp(no->info.ingles, palavra) == 0)
-//            removeu = 1;
-//        removeu = funcaoauxIII(no->esq, palavra);
-//        removeu = funcaoauxIII(no->dir, palavra);
-//    }
-//    return removeu;
-//}
-
-void funcaoauxIII(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni)
+void remover_ingles_RN(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni)
 {
     int verificacao = 0;
 
     if(*no != NULL)
     {
-        funcaoIII(&(*no)->info.ingles, palavra, uni);
+        remover_ingles_BB(&(*no)->info.ingles, palavra, uni);
 
         if((*no)->info.ingles == NULL)
         {
-            verificacao = remove_arvRN(portugues, (*no)->info.ptbr);
+            verificacao = remove_arv_RN(portugues, (*no)->info.ptbr);
             if(verificacao == 1)printf("removido\n");
             else printf("nao removido\n");
         }
         
         if(*no != NULL)
-            funcaoauxIII(&(*no)->esq, portugues, palavra, uni);
+            remover_ingles_RN(&(*no)->esq, portugues, palavra, uni);
         if(*no != NULL)
-            funcaoauxIII(&(*no)->dir, portugues, palavra, uni);
+            remover_ingles_RN(&(*no)->dir, portugues, palavra, uni);
     }
 }
-void funcaoIII(arv_ingles **no, char *palavra, int uni)
+void remover_ingles_BB(arv_ingles **no, char *palavra, int uni)
 {
     if(*no != NULL)
     {
@@ -548,55 +535,98 @@ void funcaoIII(arv_ingles **no, char *palavra, int uni)
                     free(aux); 
                     aux = (anterior == NULL) ? atual->info.l_unidade : anterior->prox;
 
-                    if (atual->info.l_unidade == NULL) {
+
+                    if (atual->info.l_unidade == NULL) 
+                    {
                         removeuBB = remover_arv_BB(&(*no), atual);
-                        if (removeuBB == 1)
-                            printf("Palavra removida da árvore binária: %s\n", atual->info.ingles);
-                        else
-                            printf("Falha ao remover a palavra da árvore binária: %s\n", atual->info.ingles);
+                            if (removeuBB == 1)
+                                printf("Palavra removida da árvore binária: %s\n", atual->info.ingles);
+                            else
+                                printf("Falha ao remover a palavra da árvore binária: %s\n", atual->info.ingles);
+                    }else 
+                    {
+                        anterior = aux;
+                        aux = aux->prox;
                     }
-                } else {
-                    anterior = aux;
-                    aux = aux->prox;
                 }
             }
         }
-        if(*no != NULL)
-            funcaoIII(&(*no)->esq, palavra, uni);
-        if(*no != NULL)
-            funcaoIII(&(*no)->dir, palavra, uni);
+            if(*no != NULL)
+                remover_ingles_BB(&(*no)->esq, palavra, uni);
+            if(*no != NULL)
+                remover_ingles_BB(&(*no)->dir, palavra, uni);
     }
 }
 
-void funcaoIV(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni)
+void remover_portugues_RN(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni)
 {
     int verificacao = 0;
-    arv_ingles *atual;
 
     if(*no != NULL)
     {
-        if(strcmp(palavra, (*no)->info.ptbr) == 0)
+        if(strcmp((*no)->info.ptbr, palavra) == 0)
         {
-            char palavra_ingles[100];
-            atual = (*no)->info.ingles;
-
-            strcpy(palavra_ingles, atual->info.ingles);
-
-            funcaoIII(&(*no)->info.ingles, palavra_ingles, uni);
+            remover_portugues_BB(&(*no)->info.ingles, uni);
 
             if((*no)->info.ingles == NULL)
             {
-                verificacao = remove_arvRN(portugues, palavra);
-                if(verificacao == 1)printf("removido da rubro negra\n");
-                else printf("nao foi removido da rubro negra\n");
+                verificacao = remove_arv_RN(portugues, (*no)->info.ptbr);
+                if(verificacao == 1)printf("removido\n");
+                else printf("nao removido\n");
             }
-
-            }
-            if(*no != NULL)
-                funcaoIV(&(*no)->esq, portugues, palavra, uni);
-            if(*no != NULL)
-                funcaoIV(&(*no)->dir, portugues, palavra, uni);
         }
+        
+        if(*no != NULL)
+            remover_portugues_RN(&(*no)->esq, portugues, palavra, uni);
+        if(*no != NULL)
+            remover_portugues_RN(&(*no)->dir, portugues, palavra, uni);
+    }
+}
+void remover_portugues_BB(arv_ingles **no, int uni)
+{
+    int removeuBB = 0;
+    arv_ingles *atual;
+    unidade *aux;
+    unidade *anterior;
+    anterior = NULL;
+
+    if(*no != NULL)
+    {
+        atual = (*no);
+        aux = atual->info.l_unidade;
+        
+            while(aux != NULL)
+            {
+                if(uni == aux->unidade)
+                {
+                    if (anterior == NULL)
+                        atual->info.l_unidade = aux->prox; 
+                    else 
+                        anterior->prox = aux->prox; 
+
+                    free(aux); 
+                    aux = (anterior == NULL) ? atual->info.l_unidade : anterior->prox;
+
+                }
+
+                    if (atual->info.l_unidade == NULL) 
+                    {
+                        removeuBB = remover_arv_BB(&(*no), atual);
+                            if (removeuBB == 1)
+                                printf("Palavra removida da árvore binária: %s\n", atual->info.ingles);
+                            else
+                                printf("Falha ao remover a palavra da árvore binária: %s\n", atual->info.ingles);
+                    }else 
+                    {
+                        anterior = aux;
+                        aux = aux->prox;
+                    }
+            }
+                if(*no != NULL)
+                    remover_portugues_BB(&(*no)->esq, uni);
+                if(*no != NULL)
+                    remover_portugues_BB(&(*no)->dir, uni);
+    }
 }
 
 
@@ -622,12 +652,12 @@ void liberar_arv_BB(arv_ingles *no)
         free(no);
     }
 }
-void liberar_arvRN(arv_ptbr *no)
+void liberar_arv_RN(arv_ptbr *no)
 {
     if(no != NULL)
     {
-        liberar_arvRN(no->esq);
-        liberar_arvRN(no->dir);
+        liberar_arv_RN(no->esq);
+        liberar_arv_RN(no->dir);
 
         free(no);
     }

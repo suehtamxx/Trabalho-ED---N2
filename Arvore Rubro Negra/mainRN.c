@@ -65,7 +65,7 @@ int main() {
     printf("informe a unidade: \n");
     scanf("%d", &unidade);
 
-    funcaoIV(&dicionario_portugues, &dicionario_portugues, palavra, unidade);
+    funcaoauxIV(&dicionario_portugues, &dicionario_portugues, palavra, unidade);
 
     imprimir_arvore_rubro_negra(dicionario_portugues, 0);
 

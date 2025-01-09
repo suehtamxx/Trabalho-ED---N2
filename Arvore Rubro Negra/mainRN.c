@@ -82,7 +82,7 @@ int main()
             printf("\nInforme de qual unidade: ");
             scanf(" %d", &unid);
 
-            remover_ingles_RN(NULL, &dicionario_portugues, palavra, unid);
+            remover_ingles_RN(&dicionario_portugues, &dicionario_portugues, palavra, unid);
             imprimir_arvore_RN(dicionario_portugues);
 
             break;
@@ -93,7 +93,7 @@ int main()
             printf("\nInforme de qual unidade: ");
             scanf(" %d", &unid);
 
-            remover_portugues_RN(NULL, &dicionario_portugues, palavra, unid);
+            remover_portugues_RN(&dicionario_portugues, &dicionario_portugues, palavra, unid);
             imprimir_arvore_RN(dicionario_portugues);
 
             break;

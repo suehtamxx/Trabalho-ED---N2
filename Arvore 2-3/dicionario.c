@@ -1074,7 +1074,8 @@ int remover_arv_B3(arv_ptbr **pai, arv_ptbr **portugues, char *palavra, int *fla
 void liberar_lista_unidades(unidade *l_unidade) 
 {
     unidade *atual = l_unidade;
-    while (atual != NULL) {
+    while (atual != NULL)
+    {
         unidade *prox = atual->prox;
         free(atual);
         atual = prox;
@@ -1082,26 +1083,27 @@ void liberar_lista_unidades(unidade *l_unidade)
 }
 void liberar_arv_BB(arv_ingles *no) 
 {
-    if (no != NULL) {
-        // Libera as subárvores recursivamente
-            liberar_arv_BB(no->esq);
-            liberar_arv_BB(no->dir);
+    if (no != NULL) 
+    {
+        liberar_arv_BB(no->esq);
+        liberar_arv_BB(no->dir);
 
-        // Libera a lista de unidades associada ao nó
         liberar_lista_unidades(no->info.l_unidade);
 
-        // Libera o nó atual
         free(no);
     }
 }
 void liberar_arv_B3(arv_ptbr *no) 
 {
-    if (no != NULL) {
-        // Libera as subárvores recursivamente
-            liberar_arv_B3(no->esq);
-            liberar_arv_B3(no->cen);
-            if(no->nInfos == 2)
-                liberar_arv_B3(no->dir);
+    if (no != NULL) 
+    {
+        liberar_arv_B3(no->esq);
+        liberar_arv_B3(no->cen);
+        if(no->nInfos == 2)
+            liberar_arv_B3(no->dir);
+
+        if (no->info.l_arv_BB != NULL) 
+            liberar_arv_BB(no->info.l_arv_BB);
             
         free(no);
     }

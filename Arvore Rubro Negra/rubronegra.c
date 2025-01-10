@@ -18,7 +18,6 @@ unidade *criar_no_l_unid()
 
     return no;
 }
-
 arv_ingles *cria_no_arv_BB()
 {
     arv_ingles *no; //Cria o nó
@@ -30,7 +29,6 @@ arv_ingles *cria_no_arv_BB()
 
     return no; //Retorna o nó alocado
 }
-
 arv_ptbr *criar_no_arv_RN()
 {
     arv_ptbr *no;
@@ -130,7 +128,6 @@ int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no)
 
     return inseriu;
 }
-
 void inserir_arv_RN(arv_ptbr **R, arv_ptbr *no)
 {
     if(*R == NULL)
@@ -155,6 +152,7 @@ void inserir_arv_RN(arv_ptbr **R, arv_ptbr *no)
         trocaCor(*R);
     }
 }
+
 void move2EsqRed(arv_ptbr **r)
 {
     trocaCor(*r);
@@ -168,7 +166,6 @@ void move2EsqRed(arv_ptbr **r)
         }
     }
 }
-
 void move2DirRed(arv_ptbr **r)
 {
     trocaCor(*r);
@@ -181,6 +178,7 @@ void move2DirRed(arv_ptbr **r)
         }
     }
 }
+
 arv_ptbr *balancear(arv_ptbr *r)
 {
     if(r != NULL)
@@ -208,7 +206,6 @@ arv_ptbr *removeMenor(arv_ptbr *no)
 
     return balancear(no);
 }
-
 arv_ptbr *procuraMenor(arv_ptbr *atual)
 {
     arv_ptbr *no1, *no2;
@@ -221,7 +218,6 @@ arv_ptbr *procuraMenor(arv_ptbr *atual)
     }
     return no1;
 }
-
 arv_ptbr *remove_no(arv_ptbr *no, char *valor)
 {
     if(no != NULL)
@@ -256,7 +252,6 @@ arv_ptbr *remove_no(arv_ptbr *no, char *valor)
     }
     return balancear(no);
 }
-
 int remove_arv_RN(arv_ptbr **no, char *valor)
 {
     int verificacao = 0;
@@ -279,6 +274,7 @@ int eh_folha_BB(arv_ingles *ingles)
     
     return verifica; //Retorna a verificação
 }
+
 arv_ingles *menor_filho_BB(arv_ingles *ingles)
 {
     while(ingles != NULL && ingles->esq != NULL)

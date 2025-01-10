@@ -27,9 +27,9 @@ typedef struct informacao_ptbr
 
 typedef struct arvore_portugues
 {
-    struct arvore_portugues *esq, *cen, *dir;
-    info_ptbr info1, info2;
     int nInfos;
+    info_ptbr info1, info2;
+    struct arvore_portugues *esq, *cen, *dir;
 }arv_ptbr;
 
 //----Alocar nó da Árvore e da Lista

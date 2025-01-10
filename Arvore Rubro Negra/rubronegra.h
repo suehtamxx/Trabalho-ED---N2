@@ -18,8 +18,8 @@ typedef struct informacao_ingles
 
 typedef struct arvore_ingles
 {
-    struct arvore_ingles *esq, *dir;
     info_ingles info;
+    struct arvore_ingles *esq, *dir;
 }arv_ingles;
 
 typedef struct informacao_ptbr

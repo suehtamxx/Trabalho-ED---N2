@@ -44,27 +44,31 @@ void trocaCor(arv_ptbr *no);
 
 int inserir_arv_BB(arv_ingles **ingles, arv_ingles *no);
 void inserir_arv_RN(arv_ptbr **R, arv_ptbr *no);
+int remove_arv_RN(arv_ptbr **no, char *valor);
+
 void move2EsqRed(arv_ptbr **r);
 void move2DirRed(arv_ptbr **r);
 arv_ptbr *balancear(arv_ptbr *r);
 arv_ptbr *removeMenor(arv_ptbr *no);
 arv_ptbr *procuraMenor(arv_ptbr *no);
-
-
 arv_ptbr *remove_no(arv_ptbr *no, char *valor);
-int remove_arv_RN(arv_ptbr **no, char *valor);
 
 int remover_arv_BB(arv_ingles **ingles, arv_ingles *no);
 int eh_folha_BB(arv_ingles *ingles);
 arv_ingles *menor_filho_BB(arv_ingles *ingles);
 arv_ingles *so_um_filho_BB(arv_ingles *ingles);
 
+void ler_arquivo(arv_ptbr **portugues);
+
 void imprimir_unidade_RN(arv_ptbr *no, int uni);
 void imprimir_unidade_BB(arv_ingles *no, int uni, char *palavra);
+
 void imprimir_ptbr_BB(arv_ingles *no, char *palavra);
 void imprimir_ptbr_RN(arv_ptbr *no, char *palavra);
+
 void remover_ingles_BB(arv_ingles **no, char *palavra, int uni);
 void remover_ingles_RN(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni);
+
 void remover_portugues_BB(arv_ingles **no, int uni);
 void remover_portgues_RN(arv_ptbr **no, arv_ptbr **portugues, char *palavra, int uni);
 

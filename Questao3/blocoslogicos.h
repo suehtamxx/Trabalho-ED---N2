@@ -33,7 +33,7 @@ arv_blocos *inserir_arv_B3(arv_blocos **blocos, info_blocos info, info_blocos *p
 void imprimir_arvore_B3(arv_blocos *blocos);
 arv_blocos *busca_MenorNo(arv_blocos **no);
 arv_blocos *busca_MaiorNo(arv_blocos **no);
-void ocupa_espaco(arv_blocos **no ,arv_blocos **raiz, int *qtd, int *flag);
+void ocupa_espaco(arv_blocos **no ,arv_blocos **raiz, int *qtd, int *verificacao, int status);
 int remove_esq_folha(arv_blocos **portugues, arv_blocos **pai);
 int remove_centro_folha(arv_blocos **blocos, arv_blocos **pai);
 void remove_dir_folha(arv_blocos **blocos, arv_blocos **pai);

@@ -652,7 +652,6 @@ int remove_esq_folha(arv_ptbr **portugues, arv_ptbr **pai)
 	//retorna 0 se ao remover_arv_B3 a arvore nao foi desbalanceada, retorna 1 se foi desbalanceada
 	return flag; 
 }
-
 int remove_centro_folha(arv_ptbr **portugues, arv_ptbr **pai)
 {
 

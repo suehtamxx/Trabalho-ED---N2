@@ -652,6 +652,7 @@ int remove_esq_folha(arv_ptbr **portugues, arv_ptbr **pai)
 	//retorna 0 se ao remover_arv_B3 a arvore nao foi desbalanceada, retorna 1 se foi desbalanceada
 	return flag; 
 }
+
 int remove_centro_folha(arv_ptbr **portugues, arv_ptbr **pai)
 {
 
@@ -1102,8 +1103,8 @@ void liberar_arv_B3(arv_ptbr *no)
         if(no->nInfos == 2)
             liberar_arv_B3(no->dir);
 
-        if (no->info.l_arv_BB != NULL) 
-            liberar_arv_BB(no->info.l_arv_BB);
+        if (no->info1.ingles != NULL) 
+            liberar_arv_BB(no->info1.ingles);
             
         free(no);
     }

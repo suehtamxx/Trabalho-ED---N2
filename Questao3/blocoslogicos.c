@@ -70,6 +70,7 @@ arv_blocos *adiciona_chave(arv_blocos *no, info_blocos info, arv_blocos *filho)
     
     return (no); //Retorna o nó com as infos inseridas
 }
+
 int eh_folha_B3(arv_blocos *blocos)
 {
     int verifica = 0; //Cria e inicializa o verifica com 0, ou seja, pressupõe que é nulo
@@ -202,7 +203,49 @@ void cadastrar(arv_blocos **no, int qtd)
         inserir_arv_B3(no, info, &promove, &pai);
     }  
 }   
+void concatena(arv_blocos **raiz, arv_blocos **no)
+{
+    int flag = 0, aux;
 
+    if(*raiz != NULL && *no != NULL)
+    {
+       if ((*raiz)->nInfos == 1)
+       {						
+            if ((*no)->esq == *raiz)
+            {
+                (*no)->info1.blocoi = (*raiz)->info1.blocoi;
+                remover_arv_B3(no, raiz, (*raiz)->info1.blocoi, &flag); 										 
+            }
+            //caso em que a raiz esta entre um no ocupado e um livre, concatena raiz com a info2 do pai e remove a raiz
+            else if ((*no)->dir == *raiz)
+            {
+                (*no)->info2.blocof = (*raiz)->info1.blocof;
+                remover_arv_B3(no, raiz, (*raiz)->info1.blocoi, &flag); 
+            }
+            //caso em que a raiz esta entre duas infos ocupadas, concatena raiz com a info1 e a info2 do pai e remove a raiz  e a info2 do pai
+            else
+            {                            
+                if ((*no)->nInfos == 2)
+                {    
+                    (*no)->info1.blocof = (*no)->info2.blocof;                    
+                    aux = (*no)->info2.blocoi;
+
+                    remover_arv_B3(no, raiz, (*raiz)->info1.blocoi, &flag);	
+                    remover_arv_B3(no, raiz, aux, &flag);	
+                }
+            }	
+        }
+        //quando a raiz possui 2 infos, entao a info que queremos ocupar esta entre duas infos ocupadas, concatenamos com a info do pai e removemos a raiz
+        else
+        {   
+            if((*no)->cen == *raiz) (*no)->info1.blocof = (*raiz)->info2.blocof;            
+            else (*no)->info2.blocof = (*raiz)->info2.blocof;
+
+            remover_arv_B3(no, raiz, (*raiz)->info2.blocoi, &flag);
+            remover_arv_B3(no, raiz, (*raiz)->info1.blocoi, &flag);
+        }         
+    }
+}
 
 arv_blocos *busca_MenorNo(arv_blocos **no){
 
@@ -215,8 +258,6 @@ arv_blocos *busca_MenorNo(arv_blocos **no){
 
 	return aux;
 }
-
-//Recebe um no e percorre a partir desse no e retorna o no com a Maior info
 arv_blocos *busca_MaiorNo(arv_blocos **no){
 
 	arv_blocos *aux;													  
@@ -227,6 +268,136 @@ arv_blocos *busca_MaiorNo(arv_blocos **no){
 		aux = *no;
 
 	return aux;
+}
+
+void ocupa_espaco(arv_blocos **no ,arv_blocos **raiz, int *qtd, int *verificacao, int status)
+{
+    if((*raiz) != NULL && *verificacao != 1)
+    {
+        if((*raiz)->info1.status == status && ((*raiz)->info1.blocof - (*raiz)->info1.blocoi) > *qtd)
+        {
+            *verificacao = 1;
+            if(eh_folha_B3(*raiz) == 1)
+            {
+                if((*raiz)->nInfos == 2)
+                {
+                    (*raiz)->info1.blocof -= *qtd;
+                    (*raiz)->info2.blocoi = (*raiz)->info1.blocof + 1;
+
+                }else if((*raiz)->nInfos == 1)
+                { 
+                    if(*no == NULL)
+                    {
+                        (*raiz)->info2.blocof = (*raiz)->info1.blocof;
+                        (*raiz)->info1.blocof -= *qtd;
+                        (*raiz)->info2.blocoi = (*raiz)->info1.blocof + 1;
+                        (*raiz)->info2.status = 0;
+                        (*raiz)->nInfos = 2; 
+                    }else 
+                    {
+                        if((*no)->esq == *raiz)
+                        {
+                            (*raiz)->info1.blocof -= *qtd;
+                            (*no)->info1.blocoi = (*raiz)->info1.blocoi + 1;
+                        }
+                        else if((*no)->cen == *raiz)
+                        {
+                            (*no)->info1.blocof += *qtd;
+                            (*raiz)->info1.blocoi = (*no)->info1.blocof + 1;   
+                        }else if((*no)->dir == *raiz)
+                        {
+                            (*no)->info2.blocof += *qtd;
+                            (*raiz)->info1.blocoi = (*no)->info2.blocof + 1;
+                        }
+                    }
+                }
+            }else 
+                {
+                    arv_blocos *aux;
+
+                    (*raiz)->info1.blocof -= *qtd;
+                    aux = busca_MenorNo(&(*raiz)->cen);
+                    aux->info1.blocoi = (*raiz)->info1.blocof + 1;
+                }
+        
+        }else 
+            if((*raiz)->info1.status == status && ((*raiz)->info1.blocof - (*raiz)->info1.blocoi) == *qtd)
+            {
+                *verificacao = 1;
+                if(eh_folha_B3(*raiz) == 1)
+                {  
+                    if(*no == NULL)
+                    {
+                        if((*raiz)->nInfos == 2)
+                        {
+                            (*raiz)->info1.blocof = (*raiz)->info2.blocof;
+                            (*raiz)->info1.status = 0;
+                            (*raiz)->nInfos = 1;
+                        }else (*raiz)->info1.status = 0;
+                    }else
+                        concatena(raiz, no);
+                }else
+                {
+                    arv_blocos *maior,*menor;
+
+                    maior = busca_MaiorNo(&(*raiz)->esq); 
+                    menor = busca_MenorNo(&(*raiz)->cen); 
+
+                    maior->info1.blocof = menor->info1.blocof; 
+
+                    remover_arv_B3(no, raiz, menor->info1.blocoi, verificacao);
+                    remover_arv_B3(no, raiz,(*raiz)->info1.blocoi, verificacao);
+                }
+
+            }else 
+                if((*raiz)->info2.status == status && ((*raiz)->info2.blocof - (*raiz)->info2.blocoi) > *qtd)
+                {
+                    *verificacao = 1;
+                    if(eh_folha_B3(*raiz) == 1)
+                    {
+                        (*raiz)->info1.blocof += *qtd;
+                        (*raiz)->info2.blocoi = (*raiz)->info1.blocof + 1;
+                    }else
+                    {
+                        arv_blocos *aux;
+
+                        (*raiz)->info2.blocof -= *qtd;
+                        
+                        aux = busca_MenorNo(&(*raiz)->dir);
+
+                        aux->info1.blocoi = (*raiz)->info2.blocof + 1;
+                    }
+                }else
+                    if((*raiz)->info2.status == status && ((*raiz)->info2.blocof - (*raiz)->info2.blocoi) == *qtd)
+                    {
+                        *verificacao = 1;
+                        if(eh_folha_B3(*raiz) == 1)
+                        {
+                            (*raiz)->info1.blocof = (*raiz)->info2.blocof;
+                            (*raiz)->nInfos = 1;
+                        }else
+                        {
+                            arv_blocos *maior,*menor;
+
+                            maior = busca_MaiorNo(&(*raiz)->cen); 
+                            menor = busca_MenorNo(&(*raiz)->dir); 
+
+                            maior->info1.blocof = menor->info1.blocof; 
+                            remover_arv_B3(no, raiz, menor->info1.blocoi, verificacao);
+                            remover_arv_B3(no, raiz, (*raiz)->info2.blocoi, verificacao);
+		
+                        }
+                    }else
+                    {
+                        if((*raiz)->esq != NULL)
+                            ocupa_espaco(raiz, &(*raiz)->esq, qtd, verificacao, status);
+                        if((*raiz)->cen != NULL)
+                            ocupa_espaco(raiz, &(*raiz)->cen, qtd, verificacao, status);
+                        if((*raiz)->dir != NULL && (*raiz)->nInfos == 2)
+                            ocupa_espaco(raiz, &(*raiz)->dir, qtd, verificacao, status);
+                    }
+    }
+
 }
 
 void libera_no(arv_blocos **no)
@@ -651,180 +822,6 @@ int remover_arv_B3(arv_blocos **pai, arv_blocos **blocos, int inicial, int *flag
 	return balanceamento;
 }
 
-void concatena(arv_blocos **raiz, arv_blocos **no)
-{
-    int flag = 0, aux;
-
-    if(*raiz != NULL && *no != NULL)
-    {
-       if ((*raiz)->nInfos == 1)
-       {						
-            if ((*no)->esq == *raiz)
-            {
-                (*no)->info1.blocoi = (*raiz)->info1.blocoi;
-                remover_arv_B3(no, raiz, (*raiz)->info1.blocoi, &flag); 										 
-            }
-            //caso em que a raiz esta entre um no ocupado e um livre, concatena raiz com a info2 do pai e remove a raiz
-            else if ((*no)->dir == *raiz)
-            {
-                (*no)->info2.blocof = (*raiz)->info1.blocof;
-                remover_arv_B3(no, raiz, (*raiz)->info1.blocoi, &flag); 
-            }
-            //caso em que a raiz esta entre duas infos ocupadas, concatena raiz com a info1 e a info2 do pai e remove a raiz  e a info2 do pai
-            else
-            {                            
-                if ((*no)->nInfos == 2)
-                {    
-                    (*no)->info1.blocof = (*no)->info2.blocof;                    
-                    aux = (*no)->info2.blocoi;
-
-                    remover_arv_B3(no, raiz, (*raiz)->info1.blocoi, &flag);	
-                    remover_arv_B3(no, raiz, aux, &flag);	
-                }
-            }	
-        }
-        //quando a raiz possui 2 infos, entao a info que queremos ocupar esta entre duas infos ocupadas, concatenamos com a info do pai e removemos a raiz
-        else
-        {   
-            if((*no)->cen == *raiz) (*no)->info1.blocof = (*raiz)->info2.blocof;            
-            else (*no)->info2.blocof = (*raiz)->info2.blocof;
-
-            remover_arv_B3(no, raiz, (*raiz)->info2.blocoi, &flag);
-            remover_arv_B3(no, raiz, (*raiz)->info1.blocoi, &flag);
-        }         
-    }
-}
-
-void ocupa_espaco(arv_blocos **no ,arv_blocos **raiz, int *qtd, int *verificacao, int status)
-{
-    if((*raiz) != NULL && *verificacao != 1)
-    {
-        if((*raiz)->info1.status == status && ((*raiz)->info1.blocof - (*raiz)->info1.blocoi) > *qtd)
-        {
-            *verificacao = 1;
-            if(eh_folha_B3(*raiz) == 1)
-            {
-                if((*raiz)->nInfos == 2)
-                {
-                    (*raiz)->info1.blocof -= *qtd;
-                    (*raiz)->info2.blocoi = (*raiz)->info1.blocof + 1;
-
-                }else if((*raiz)->nInfos == 1)
-                { 
-                    if(*no == NULL)
-                    {
-                        (*raiz)->info2.blocof = (*raiz)->info1.blocof;
-                        (*raiz)->info1.blocof -= *qtd;
-                        (*raiz)->info2.blocoi = (*raiz)->info1.blocof + 1;
-                        (*raiz)->info2.status = 0;
-                        (*raiz)->nInfos = 2; 
-                    }else 
-                    {
-                        if((*no)->esq == *raiz)
-                        {
-                            (*raiz)->info1.blocof -= *qtd;
-                            (*no)->info1.blocoi = (*raiz)->info1.blocoi + 1;
-                        }
-                        else if((*no)->cen == *raiz)
-                        {
-                            (*no)->info1.blocof += *qtd;
-                            (*raiz)->info1.blocoi = (*no)->info1.blocof + 1;   
-                        }else if((*no)->dir == *raiz)
-                        {
-                            (*no)->info2.blocof += *qtd;
-                            (*raiz)->info1.blocoi = (*no)->info2.blocof + 1;
-                        }
-                    }
-                }
-            }else 
-                {
-                    arv_blocos *aux;
-
-                    (*raiz)->info1.blocof -= *qtd;
-                    aux = busca_MenorNo(&(*raiz)->cen);
-                    aux->info1.blocoi = (*raiz)->info1.blocof + 1;
-                }
-        
-        }else 
-            if((*raiz)->info1.status == status && ((*raiz)->info1.blocof - (*raiz)->info1.blocoi) == *qtd)
-            {
-                *verificacao = 1;
-                if(eh_folha_B3(*raiz) == 1)
-                {  
-                    if(*no == NULL)
-                    {
-                        if((*raiz)->nInfos == 2)
-                        {
-                            (*raiz)->info1.blocof = (*raiz)->info2.blocof;
-                            (*raiz)->info1.status = 0;
-                            (*raiz)->nInfos = 1;
-                        }else (*raiz)->info1.status = 0;
-                    }else
-                        concatena(raiz, no);
-                }else
-                {
-                    arv_blocos *maior,*menor;
-
-                    maior = busca_MaiorNo(&(*raiz)->esq); 
-                    menor = busca_MenorNo(&(*raiz)->cen); 
-
-                    maior->info1.blocof = menor->info1.blocof; 
-
-                    remover_arv_B3(no, raiz, menor->info1.blocoi, verificacao);
-                    remover_arv_B3(no, raiz,(*raiz)->info1.blocoi, verificacao);
-                }
-
-            }else 
-                if((*raiz)->info2.status == status && ((*raiz)->info2.blocof - (*raiz)->info2.blocoi) > *qtd)
-                {
-                    *verificacao = 1;
-                    if(eh_folha_B3(*raiz) == 1)
-                    {
-                        (*raiz)->info1.blocof += *qtd;
-                        (*raiz)->info2.blocoi = (*raiz)->info1.blocof + 1;
-                    }else
-                    {
-                        arv_blocos *aux;
-
-                        (*raiz)->info2.blocof -= *qtd;
-                        
-                        aux = busca_MenorNo(&(*raiz)->dir);
-
-                        aux->info1.blocoi = (*raiz)->info2.blocof + 1;
-                    }
-                }else
-                    if((*raiz)->info2.status == status && ((*raiz)->info2.blocof - (*raiz)->info2.blocoi) == *qtd)
-                    {
-                        *verificacao = 1;
-                        if(eh_folha_B3(*raiz) == 1)
-                        {
-                            (*raiz)->info1.blocof = (*raiz)->info2.blocof;
-                            (*raiz)->nInfos = 1;
-                        }else
-                        {
-                            arv_blocos *maior,*menor;
-
-                            maior = busca_MaiorNo(&(*raiz)->cen); 
-                            menor = busca_MenorNo(&(*raiz)->dir); 
-
-                            maior->info1.blocof = menor->info1.blocof; 
-                            remover_arv_B3(no, raiz, menor->info1.blocoi, verificacao);
-                            remover_arv_B3(no, raiz, (*raiz)->info2.blocoi, verificacao);
-		
-                        }
-                    }else
-                    {
-                        if((*raiz)->esq != NULL)
-                            ocupa_espaco(raiz, &(*raiz)->esq, qtd, verificacao, status);
-                        if((*raiz)->cen != NULL)
-                            ocupa_espaco(raiz, &(*raiz)->cen, qtd, verificacao, status);
-                        if((*raiz)->dir != NULL && (*raiz)->nInfos == 2)
-                            ocupa_espaco(raiz, &(*raiz)->dir, qtd, verificacao, status);
-                    }
-    }
-
-}
-
 arv_blocos *buscar_no(arv_blocos *no, int status, int qtd)
 {
     arv_blocos *bloco;
@@ -851,8 +848,6 @@ arv_blocos *buscar_no(arv_blocos *no, int status, int qtd)
     }
     return bloco;
 }
-
-
 
 void liberar_arv_B3(arv_blocos *no) 
 {

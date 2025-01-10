@@ -76,5 +76,3 @@ int main()
     
     liberar_arv_B3(blocos);
 }
-
-//void inserir_no(no, info, qtd);

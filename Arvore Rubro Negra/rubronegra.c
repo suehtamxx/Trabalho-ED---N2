@@ -376,8 +376,6 @@ void ler_arquivo(arv_ptbr **portugues)
                 if (len > 0 && palavras_portugues[len - 1] == ';')
                     palavras_portugues[len - 1] = '\0';
 
-                printf("Lido: Inglês = %s, Português = %s\n", palavra_ingles, palavras_portugues);
-
                 // Processa cada tradução em português
                 char *palavra_port = strtok(palavras_portugues, ",");
                 while (palavra_port)

@@ -52,22 +52,23 @@ void buscar_palavras(arv_ptbr *raiz, char *palavra, char *caminho, int *encontro
 void calcular_tempo(arv_ptbr *raiz, char palavras[][100])
 {
     LARGE_INTEGER inicio, fim, frequencia;
-    
-    QueryPerformanceFrequency(&frequencia);  // Obtém a frequência do contador de alta precisão
+    QueryPerformanceFrequency(&frequencia); 
+
+    double tempo_total = 0.0;  
+ 
 
     for (int i = 0; i < Repeticao; i++)
     {
         char caminho[1000] = "";
         int encontrou = 0;
 
-        QueryPerformanceCounter(&inicio);  // Captura o início do contador
-
+        QueryPerformanceCounter(&inicio);  
         buscar_palavras(raiz, palavras[i], caminho, &encontrou);
 
-        QueryPerformanceCounter(&fim);  // Captura o fim do contador
+        QueryPerformanceCounter(&fim); 
 
-        // Calcula o tempo em milissegundos
         double tempo = (double)(fim.QuadPart - inicio.QuadPart) * 1000.0 / frequencia.QuadPart;
+        tempo_total += tempo;
 
         printf("\n------------------------------\n");
         printf("Busca: %d\n", i);
@@ -76,6 +77,9 @@ void calcular_tempo(arv_ptbr *raiz, char palavras[][100])
         printf("Encontrada: %s\n", encontrou ? "Sim" : "Nao");
         printf("Tempo gasto: %.6f milissegundos\n\n", tempo);
     }
+    
+    double tempo_medio = tempo_total / Repeticao;
+    printf("\nMedia de tempo: %f milissegundos\n", tempo_medio);
 }
 void preencher_matriz_arvore(arv_ptbr *raiz, char palavras[][100], int *posicao)
 {
